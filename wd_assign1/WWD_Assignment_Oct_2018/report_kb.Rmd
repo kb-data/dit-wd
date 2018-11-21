@@ -342,9 +342,15 @@ colnames(camera2.all) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'We
 
 for(week.i in 1:length(sheet.names))
 {
-  f1 <- read_ods('pedestrianfootfall2013.ods',sheet.names[i])
+  f1 <- read_ods('pedestrianfootfall2013.ods',sheet.names[week.i])
   
-  colnames(f1) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out')
+  if (ncol(f1)==15)
+  {
+    colnames(f1) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out')
+  } else {
+    colnames(f1) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out', 'unknown1', 'unknown2', 'unknown3')
+  }
+  f1 <- select(f1, Time, Mon.In, Mon.Out, Tue.In, Tue.Out, Wed.In, Wed.Out, Thurs.In, Thurs.Out, Fri.In, Fri.Out, Sat.In, Sat.Out, Sun.In, Sun.Out)
   
   camera1.row <- which(grepl(camera1.name, f1$Time))
   camera2.row <- which(grepl(camera2.name, f1$Time))
@@ -355,15 +361,26 @@ for(week.i in 1:length(sheet.names))
   camera1.all <- rbind(camera1.all, camera1.slice)
   camera2.all <- rbind(camera2.all, camera2.slice)
   
+  #print(week.i)
+  
   f1 <- NULL
 }
 
 #all fields are character (they contained some text before using split), so must change all numeric characters to numeric
-for (i in 1:length(col.change))
-{
-  camera1.all[[col.change[i]]] <- as.numeric(camera1.all[[col.change[i]]])
-  camera2.all[[col.change[i]]] <- as.numeric(camera2.all[[col.change[i]]])
-}
+camera1.all$Mon.In <- as.numeric(camera1.all$Mon.In)
+camera1.all$Mon.Out <- as.numeric(camera1.all$Mon.Out)
+camera1.all$Tue.In <- as.numeric(camera1.all$Tue.In)
+camera1.all$Tue.Out <- as.numeric(camera1.all$Tue.Out)
+camera1.all$Wed.In <- as.numeric(camera1.all$Wed.In)
+camera1.all$Wed.Out <- as.numeric(camera1.all$Wed.Out)
+camera1.all$Thurs.In <- as.numeric(camera1.all$Thurs.In)
+camera1.all$Thurs.Out <- as.numeric(camera1.all$Thurs.Out)
+camera1.all$Fri.In <- as.numeric(camera1.all$Fri.In)
+camera1.all$Fri.Out <- as.numeric(camera1.all$Fri.Out)
+camera1.all$Sat.In <- as.numeric(camera1.all$Sat.In)
+camera1.all$Sat.Out <- as.numeric(camera1.all$Sat.Out)
+camera1.all$Sun.In <- as.numeric(camera1.all$Sun.In)
+camera1.all$Sun.Out <- as.numeric(camera1.all$Sun.Out)
 
 camera1.all$Week <- gsub('Sheet13', 'Week_13', camera1.all$Week)
 camera2.all$Week <- gsub('Sheet13', 'Week_13', camera2.all$Week)
@@ -371,16 +388,63 @@ camera2.all$Week <- gsub('Sheet13', 'Week_13', camera2.all$Week)
 summary(camera1.all)
 summary(camera2.all)
 ```
+
+
+
 ```{r}
-camera1.all
-camera1.slice
-rbind(camera2.all, camera2.slice)
+f1 <- read_ods('pedestrianfootfall2013.ods',sheet.names[40])
+  
+  colnames(f1) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out')
+  
+  camera1.row <- which(grepl(camera1.name, f1$Time))
+  camera2.row <- which(grepl(camera2.name, f1$Time))
+
+  camera1.slice <- slice(f1, (camera1.row+3):(camera1.row+26)) %>% mutate(Week=sheet.names[45])
+  camera2.slice <- slice(f1, (camera2.row+3):(camera2.row+26)) %>% mutate(Week=sheet.names[45])
+  
+  camera1.all <- rbind(camera1.all, camera1.slice)
+  camera2.all <- rbind(camera2.all, camera2.slice)
+  
+  camera1.row
+  camera2.row
+  
+  camera1.slice
+  camera2.slice
+  f1
+  dplyr::slice(f1, 1:5)
+  
 ```
+
+```{r}
+y <- read_ods('pedestrianfootfall2013.ods',sheet.names[46])
+y
+colnames(y) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out', 'unknown1', 'unknown2', 'unknown3')
+y<-select(y, Time, Mon.In, Mon.Out, Tue.In, Tue.Out, Wed.In, Wed.Out, Thurs.In, Thurs.Out, Fri.In, Fri.Out, Sat.In, Sat.Out, Sun.In, Sun.Out)
+y
+dplyr::slice(y, 9:11)
+```
+
+
+```{r}
+sheet.names <- ods_sheets('pedestrianfootfall2013.ods')
+
+x <- NULL
+for (i in 1:52)
+{
+  x <- read_ods('pedestrianfootfall2013.ods',sheet.names[i])
+  colnames(x) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out')
+  print(i)
+  print(ncol(x))
+}
+
+```
+
 
 
 ```{r}
 camera1.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
 camera2.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
+f1
 ```
 
 
@@ -481,48 +545,11 @@ sound.sun <- sound.split$Sunday %>% select(Week, hour, sun.noise=mean.noise.leve
 
 sound.new <- sound.mon %>% inner_join(sound.tue, by=c('Week', 'hour')) %>% left_join(sound.wed, by=c('Week', 'hour')) %>% left_join(sound.thurs, by=c('Week', 'hour')) %>% left_join(sound.fri, by=c('Week', 'hour')) %>% left_join(sound.sat, by=c('Week', 'hour')) %>% left_join(sound.sun, by=c('Week', 'hour'))
 ```
-
-
-
-
-
-
-
-
-
 ```{r}
-jan <- html('https://www.wunderground.com/history/daily/ie/dublin/EIDW/date/2013-11-19')
-
-#jan2.nodes <- html_nodes(jan, '.city-history-observation .row .columns') #%>% html_text()
-
-jan2.nodes <- html_nodes(jan, '.summary-table tbody:nth-child(2) tr:nth-child(3) td:nth-child(2)') 
-jan2.nodes %>% html_text()#%>% html_text()
-
-jan2.nodes
-
+camera1.all
+camera2.all
+sound.new
 ```
-
-```{r}
-weather_data<-read_html("http://www.wunderground.com/history/airport/KSFO/2015/1/1/DailyHistory.html")
-mean_daily_temp<-weather_data %>% 
-        html_node(".wx-value") %>%
-        html_text() %>%
-        as.numeric()
-mean_daily_temp
-```
-
-```{r}
-library(rvest)
-jan <- read_html('https://www.wunderground.com/history/daily/ie/dublin/EIDW/date/2013-11-20')
-jan
-#View(jan %>% html_nodes('div.row.city-history-summary'))# %>% html_text()
-View(jan %>% html_nodes('div.row.city-history-summary') %>% html_nodes('div.summary-table') %>% html_node('tbody:nth-child(4) tr:nth-child(1) td:nth-child(2)') %>% html_text())
-```
-
-#inner-content > div.city-body > div.row.city-history-summary > div > div:nth-child(1) > div > div > city-history-summary > div > div.summary-table > table > tbody:nth-child(4) > tr:nth-child(1) > td:nth-child(2)
-
-undefined
-#inner-content > div.city-body > div.row.city-history-observation > div > div:nth-child(1) > div > div > city-history-observation > div > div.observation-table > table > tbody > tr > td:nth-child(1)
 
 
 
