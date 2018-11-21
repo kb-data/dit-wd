@@ -330,6 +330,10 @@ colnames(camera.locations) <- c('Loc')
 camera.locations %>% filter(., grepl("Entrance Name:", Loc, fixed = TRUE)) 
 ```
 
+```{r}
+sheet.names
+```
+
 
 ```{r}
 #
@@ -365,7 +369,9 @@ for(week.i in 1:length(sheet.names))
   
   f1 <- NULL
 }
+```
 
+```{r}
 #all fields are character (they contained some text before using split), so must change all numeric characters to numeric
 camera1.all$Mon.In <- as.numeric(camera1.all$Mon.In)
 camera1.all$Mon.Out <- as.numeric(camera1.all$Mon.Out)
@@ -382,18 +388,51 @@ camera1.all$Sat.Out <- as.numeric(camera1.all$Sat.Out)
 camera1.all$Sun.In <- as.numeric(camera1.all$Sun.In)
 camera1.all$Sun.Out <- as.numeric(camera1.all$Sun.Out)
 
+camera2.all$Mon.In <- as.numeric(camera2.all$Mon.In)
+camera2.all$Mon.Out <- as.numeric(camera2.all$Mon.Out)
+camera2.all$Tue.In <- as.numeric(camera2.all$Tue.In)
+camera2.all$Tue.Out <- as.numeric(camera2.all$Tue.Out)
+camera2.all$Wed.In <- as.numeric(camera2.all$Wed.In)
+camera2.all$Wed.Out <- as.numeric(camera2.all$Wed.Out)
+camera2.all$Thurs.In <- as.numeric(camera2.all$Thurs.In)
+camera2.all$Thurs.Out <- as.numeric(camera2.all$Thurs.Out)
+camera2.all$Fri.In <- as.numeric(camera2.all$Fri.In)
+camera2.all$Fri.Out <- as.numeric(camera2.all$Fri.Out)
+camera2.all$Sat.In <- as.numeric(camera2.all$Sat.In)
+camera2.all$Sat.Out <- as.numeric(camera2.all$Sat.Out)
+camera2.all$Sun.In <- as.numeric(camera2.all$Sun.In)
+camera2.all$Sun.Out <- as.numeric(camera2.all$Sun.Out)
+
 # there was inconsistency in sheet naming so fixing this
 camera1.all$Week <- gsub('Sheet13', 'Week_13', camera1.all$Week)
 camera2.all$Week <- gsub('Sheet13', 'Week_13', camera2.all$Week)
 
-summary(camera1.all)
-summary(camera2.all)
-```
+camera1.all$Week <- gsub('Week_1\\>', 'Week_01', camera1.all$Week)
+camera1.all$Week <- gsub('Week_2\\>', 'Week_02', camera1.all$Week)
+camera1.all$Week <- gsub('Week_3\\>', 'Week_03', camera1.all$Week)
+camera1.all$Week <- gsub('Week_4\\>', 'Week_04', camera1.all$Week)
+camera1.all$Week <- gsub('Week_5\\>', 'Week_05', camera1.all$Week)
+camera1.all$Week <- gsub('Week_6\\>', 'Week_06', camera1.all$Week)
+camera1.all$Week <- gsub('Week_7\\>', 'Week_07', camera1.all$Week)
+camera1.all$Week <- gsub('Week_8\\>', 'Week_08', camera1.all$Week)
+camera1.all$Week <- gsub('Week_9\\>', 'Week_09', camera1.all$Week)
+camera2.all$Week <- gsub('Week_1\\>', 'Week_01', camera2.all$Week)
+camera2.all$Week <- gsub('Week_2\\>', 'Week_02', camera2.all$Week)
+camera2.all$Week <- gsub('Week_3\\>', 'Week_03', camera2.all$Week)
+camera2.all$Week <- gsub('Week_4\\>', 'Week_04', camera2.all$Week)
+camera2.all$Week <- gsub('Week_5\\>', 'Week_05', camera2.all$Week)
+camera2.all$Week <- gsub('Week_6\\>', 'Week_06', camera2.all$Week)
+camera2.all$Week <- gsub('Week_7\\>', 'Week_07', camera2.all$Week)
+camera2.all$Week <- gsub('Week_8\\>', 'Week_08', camera2.all$Week)
+camera2.all$Week <- gsub('Week_9\\>', 'Week_09', camera2.all$Week)
 
-```{r}
 camera1.all
 ```
 
+```{r}
+summary(camera1.all)
+summary(camera2.all)
+```
 
 
 
@@ -401,11 +440,11 @@ camera1.all
 ```{r}
 camera1.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
 camera2.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
-f1
 ```
 
 
 ### Task 2.2
+I chose an ambient sound dataset
 ```{r}
 ambient.sound.url <- 'https://data.smartdublin.ie/dataset/a52fbbe2-1bff-4897-84af-34945f6fc8de/resource/30cb9275-f9fb-432a-af48-0a5f7ab462a4/download/chancerypark2013.zip'
 download.file(ambient.sound.url, destfile = 'ambient_sound.zip')
@@ -432,14 +471,17 @@ for (i in 1:12)
   } else {
     date.i$month.num <- i
   }
+  if(months[i]=='December')
+  {
+   date.i$day = 28 #the last 3 days of the year are excluded from the footfall dataset
+  } else {
   date.i$day <- as.Date(paste('2013','-', i ,'-01', sep=''), '%Y-%m-%d') %>% days_in_month()
-  
+  }
   dates.df <- rbind(dates.df, date.i)
   
   date.i <- NULL
 }
 
-dates.df
 ```
 
 ```{r}
@@ -467,10 +509,9 @@ for (i.month in 1:nrow(dates.df))
     sound.df<- NULL
   }
 }
-
-sound.all
-
 ```
+
+
 ```{r}
 sound.tidy <- sound.all
 sound.tidy$time <-  gsub(",","", sound.tidy$time)
@@ -480,17 +521,16 @@ sound.tidy$date.sound <-  as.Date(sound.tidy$date.sound, format='%d/%m/%Y')
 sound.tidy$hour <- format(strptime(sound.tidy$time,format='%H:%M:%S'), "%k")
 sound.tidy.summary <- sound.tidy %>% group_by(date.sound, hour) %>% summarise(mean.noise.level=mean(noise.level)) 
 
-sound.tidy.summary$Week <- gsub('_0', '_', paste('Week', strftime(sound.tidy.summary$date.sound, "%V"), sep='_'))
+sound.tidy.summary$Week <- paste('Week', strftime(sound.tidy.summary$date.sound, "%V"), sep='_')
 sound.tidy.summary$day.week <- format(as.Date(sound.tidy.summary$date.sound), "%A") 
 
 sound.tidy.all <- sound.tidy.summary[2:5] 
-sound.tidy.all
 ```
 
 
 ```{r}
-sound.split <- split(sound.tidy.all, sound.tidy.all$day.Week)
-sound.split 
+sound.split <- split(sound.tidy.all, sound.tidy.all$day.week)
+
 sound.mon <- sound.split$Monday %>% select(., Week, hour, mon.noise=mean.noise.level)
 sound.tue <- sound.split$Tuesday %>% select(Week, hour, tue.noise=mean.noise.level)
 sound.wed <- sound.split$Wednesday %>% select(Week, hour, wed.noise=mean.noise.level)
@@ -499,14 +539,12 @@ sound.fri <- sound.split$Friday %>% select(Week, hour, fri.noise=mean.noise.leve
 sound.sat <- sound.split$Saturday %>% select(Week, hour, sat.noise=mean.noise.level)
 sound.sun <- sound.split$Sunday %>% select(Week, hour, sun.noise=mean.noise.level)
 
+sound.new <- sound.mon %>% full_join(sound.tue, by=c('Week', 'hour')) %>% full_join(sound.wed, by=c('Week', 'hour')) %>% full_join(sound.thurs, by=c('Week', 'hour')) %>% full_join(sound.fri, by=c('Week', 'hour')) %>% full_join(sound.sat, by=c('Week', 'hour')) %>% full_join(sound.sun, by=c('Week', 'hour')) %>% arrange(Week, hour)
 
-sound.new <- sound.mon %>% inner_join(sound.tue, by=c('Week', 'hour')) %>% left_join(sound.wed, by=c('Week', 'hour')) %>% left_join(sound.thurs, by=c('Week', 'hour')) %>% left_join(sound.fri, by=c('Week', 'hour')) %>% left_join(sound.sat, by=c('Week', 'hour')) %>% left_join(sound.sun, by=c('Week', 'hour'))
+sound.new 
 ```
-```{r}
-camera1.all
-camera2.all
-sound.new
-```
+
+
 
 
 
