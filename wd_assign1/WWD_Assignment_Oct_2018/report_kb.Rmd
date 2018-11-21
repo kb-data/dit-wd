@@ -318,6 +318,7 @@ ggmap(dublin_intersect_stamen, legend = 'right') + geom_point(data = intersect.r
 
 # Task 4
 ```{r}
+#loading in the footfall data
 url.footfall <- 'https://data.smartdublin.ie/dataset/8204be0a-6348-459e-96e9-65bb75600ec3/resource/384fe47a-2f25-4f52-8fc5-8e61899951e9/download/pedestrianfootfall2013.ods'
 download.file(url.footfall, 'footfall_ods.ods')
 sheet.names <- ods_sheets('pedestrianfootfall2013.ods')
@@ -331,6 +332,7 @@ camera.locations %>% filter(., grepl("Entrance Name:", Loc, fixed = TRUE))
 
 
 ```{r}
+#
 camera1.name <- 'Entrance Name: Capel St at Mullen'
 camera2.name <- 'Entrance Name: Grafton St at M&S'
 
@@ -361,8 +363,6 @@ for(week.i in 1:length(sheet.names))
   camera1.all <- rbind(camera1.all, camera1.slice)
   camera2.all <- rbind(camera2.all, camera2.slice)
   
-  #print(week.i)
-  
   f1 <- NULL
 }
 
@@ -382,6 +382,7 @@ camera1.all$Sat.Out <- as.numeric(camera1.all$Sat.Out)
 camera1.all$Sun.In <- as.numeric(camera1.all$Sun.In)
 camera1.all$Sun.Out <- as.numeric(camera1.all$Sun.Out)
 
+# there was inconsistency in sheet naming so fixing this
 camera1.all$Week <- gsub('Sheet13', 'Week_13', camera1.all$Week)
 camera2.all$Week <- gsub('Sheet13', 'Week_13', camera2.all$Week)
 
@@ -389,55 +390,11 @@ summary(camera1.all)
 summary(camera2.all)
 ```
 
-
-
 ```{r}
-f1 <- read_ods('pedestrianfootfall2013.ods',sheet.names[40])
-  
-  colnames(f1) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out')
-  
-  camera1.row <- which(grepl(camera1.name, f1$Time))
-  camera2.row <- which(grepl(camera2.name, f1$Time))
-
-  camera1.slice <- slice(f1, (camera1.row+3):(camera1.row+26)) %>% mutate(Week=sheet.names[45])
-  camera2.slice <- slice(f1, (camera2.row+3):(camera2.row+26)) %>% mutate(Week=sheet.names[45])
-  
-  camera1.all <- rbind(camera1.all, camera1.slice)
-  camera2.all <- rbind(camera2.all, camera2.slice)
-  
-  camera1.row
-  camera2.row
-  
-  camera1.slice
-  camera2.slice
-  f1
-  dplyr::slice(f1, 1:5)
-  
-```
-
-```{r}
-y <- read_ods('pedestrianfootfall2013.ods',sheet.names[46])
-y
-colnames(y) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out', 'unknown1', 'unknown2', 'unknown3')
-y<-select(y, Time, Mon.In, Mon.Out, Tue.In, Tue.Out, Wed.In, Wed.Out, Thurs.In, Thurs.Out, Fri.In, Fri.Out, Sat.In, Sat.Out, Sun.In, Sun.Out)
-y
-dplyr::slice(y, 9:11)
+camera1.all
 ```
 
 
-```{r}
-sheet.names <- ods_sheets('pedestrianfootfall2013.ods')
-
-x <- NULL
-for (i in 1:52)
-{
-  x <- read_ods('pedestrianfootfall2013.ods',sheet.names[i])
-  colnames(x) <- c('Time', 'Mon.In', 'Mon.Out', 'Tue.In', 'Tue.Out', 'Wed.In', 'Wed.Out', 'Thurs.In', 'Thurs.Out', 'Fri.In', 'Fri.Out', 'Sat.In', 'Sat.Out', 'Sun.In', 'Sun.Out')
-  print(i)
-  print(ncol(x))
-}
-
-```
 
 
 
@@ -552,23 +509,6 @@ sound.new
 ```
 
 
-
-
-Take in data, shopping data and compare to footfall data - shopping stats by week? Ice cream and weather?
-Weather! Do more people walk when it's sunny?
-Pheonix park data, rainfall and temperature
-https://www.met.ie/climate/available-data/monthly-data
-https://www.met.ie/climate/available-data/historical-data
-
-tourism and a camera near a tourist place
-https://www.google.ie/search?q=number+of+tourists+in+ireland+2013&rlz=1C1CHBF_enIE815IE815&oq=number+of+tourists+in+ireland+2013&aqs=chrome..69i57.5909j0j7&sourceid=chrome&ie=UTF-8
-https://www.cso.ie/en/releasesandpublications/ep/p-biun/biun/tt/
-https://www.cso.ie/en/media/csoie/releasespublications/documents/tourismtravel/2014/Northsouth2014.pdf
-https://www.cso.ie/en/media/csoie/releasespublications/documents/tourismtravel/2013/tatq_q12013.pdf
-https://data.oecd.org/ireland.htm
-http://www.failteireland.ie/Research-Insights/Archive/2013.aspx
-
-download ods as excel file
 
 # 5 Reflection
 ## 5.1 Analytic
