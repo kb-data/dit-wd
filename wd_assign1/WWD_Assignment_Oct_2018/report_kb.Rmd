@@ -19,7 +19,7 @@ library(ggplot2)
 library(ggmap)
 devtools::install_github('hadley/ggplot2')
 devtools::install_github('dkahle/ggmap')
-library(rnoaa)
+#library(rnoaa)
 library(httr)
 library(plyr)
 library(jsonlite)
@@ -28,6 +28,8 @@ library(readODS)
 library(knitr)
 library(hms)
 library(lubridate)
+library(tidyr)
+library(stringi)
 ```
 
 
@@ -161,6 +163,7 @@ bike.df <- bike.df[order(bike.df$number),]
 
 ```{r}
 str(bike.df)
+bike.df
 ```
 
 ### 2.2 Plot Dublin Bikes Data
@@ -556,6 +559,7 @@ sound.new
 
 # 5 Reflection
 ## 5.1 Analytic
+Here I analyse the the history of my log console for the duration of this assignment.
 ```{r}
 #The history required spans multiple files so will add all here and remove duplicates and rows about other subjects
 file.list <- list('history_database/history_database', 'history_database/history_database_20181114_end',  'history_database/history_database_20181105_end', 'history_database/history_database_20181103','history_database/history_database_20181031')
@@ -571,18 +575,38 @@ for (i.hist in 1:length(file.list))
   history.read<- NULL
 }
 
-history <- history.all %>% distinct() %>% filter(V1 > 1541359887621) %>% mutate(hist.date=as.POSIXct(as.numeric(V1)/1000, origin=as.Date('1970-01-01', "%Y-%m-%d"), format = "%Y-%m-%d %H:%M:%OS")) %>% select(hist.date, hist.text=V2) 
-history
+history <- history.all %>% distinct() %>% mutate(hist.date.time.base=as.POSIXct(as.numeric(V1)/1000, origin=as.Date('1970-01-01', "%Y-%m-%d"), format = "%Y-%m-%d %H:%M:%OS")) %>% mutate(hist.date=format(hist.date.time.base, format = "%Y-%m-%d")) %>% mutate(hist.time=format(hist.date.time.base, format = "%H")) %>% mutate(hist.date.time=format(hist.date.time.base, format = "%Y-%m-%d: %H")) %>% mutate(hist.date.time.min=format(hist.date.time.base, format = "%Y-%m-%d: %H:%M")) %>% mutate(hist.time=format(hist.date.time.base, format = "%H")) %>% filter(V1 > 1541359887621) %>% select(hist.date, hist.time, hist.date.time, hist.date.time.min, hist.text=V2) %>% filter(hist.date != as.Date('1970-01-01', "%Y-%m-%d"))
+
+hist.simple <- gsub(",","", history$hist.text)
+hist.simple <- gsub("'","", hist.simple)
+word.freq <- data.frame(table(unlist(strsplit(tolower(hist.simple), " ")))) %>% arrange(desc(Freq))
+
+#history[which(grepl('distinct()', history$hist.text)),]
+#history[which(grepl('nrow', history$hist.text)),]
+
+hist.count <- count(history, hist.date.time)
 ```
 
+I ran a total of `r nrow(history)` lines of code, which contained `r sum(stri_count_words(history$hist.text))` words. 
+
+I ran on average, `r summarise(hist.count, mean(n))` commands an hour, or `r summarise(hist.count, mean(n))/60` per minute, with a median of `r summarise(hist.count, median(n))/60` commands per minute and a maximum of `r summarise(hist.count, max(n))/60` per minute. As I was running a lot of for loops, this high rate isn't unexpected.
+
+The most frequently run commands involved, as expected, assignment and piping:, <- at `r word.freq %>% filter(Var1=='<-') %>% select(Freq)` times, %>% at `r word.freq %>% filter(Var1=='%>%') %>% select(Freq)` times and = at `r word.freq %>% filter(Var1=='=') %>% select(Freq)` times. 
+
+The most common R functions were distinct() at `r word.freq %>% filter(Var1=='distinct()') %>% select(Freq)` and nrow at `r word.freq %>% filter(Var1=='nrow') %>% select(Freq)`, which I found a bit surprising until I realised that I use nrow in the footfall loop to read in the data and I used distinct() in the bus route data, which I had a bit of trouble with.
+
+The most common variables were the column names I gave to the footfall columns such as mon.in, mon.out etc, at`r word.freq %>% filter(Var1=='fri.in') %>% select(Freq)` each. As these run inside a loop to read in all the footfall data, it's not surprising that these were the most common.
+
+As I've been trying to get better at using the built in R help, I measured the number of times I used the help function by looking at the number of times '?' was used. I probably still have to get better at using it, as you can see from the figure below.
 
 ```{r}
-rquery.wordcloud(x, type=c("text", "url", "file"), 
-        lang="english", excludeWords = NULL, 
-        textStemming = FALSE,  colorPalette="Dark2",
-        max.words=200)
+hist.count.all <- history %>% count(hist.date.time) %>% mutate(label='All Commands')
+hist.help <- history[which(grepl('\\?', history$hist.text)),] %>% count(hist.date.time) %>% mutate(label='Help Function Used')
+
+ggplot(data=rbind(hist.help, hist.count.all), aes(x=hist.date.time, y=n)) + facet_grid(rows=vars(label), scale = 'free_y') + geom_histogram(stat = 'identity', fill='darkorchid3', colour='black') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Date and Hour', y = 'Number of Commands Run', title='Figure X: Number of Commands Run per Date and Hour')
 ```
 
+I can see from the graph that I tended to work in large chunks, not taking many breaks. This isn't ideal for concentration, but as I have other commitments, it's the only way I can fit in the work.
 
 
 ## 5.2 Personal Reflection
