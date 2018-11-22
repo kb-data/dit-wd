@@ -438,8 +438,14 @@ summary(camera2.all)
 
 
 ```{r}
-camera1.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
-camera2.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
+camera1.sum.week <- camera1.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
+camera2.sum.week <- camera2.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
+camera1.sum.week
+camera1.sum.week[2:15]
+rowSums(camera1.sum.week[2:15], na.rm = TRUE)
+sum(camera1.sum.week[2:15])
+
+camera1.sum.week %>% group_by(Week) %>% mutate(x=sum())
 ```
 
 
@@ -550,6 +556,33 @@ sound.new
 
 # 5 Reflection
 ## 5.1 Analytic
+```{r}
+#The history required spans multiple files so will add all here and remove duplicates and rows about other subjects
+file.list <- list('history_database/history_database', 'history_database/history_database_20181114_end',  'history_database/history_database_20181105_end', 'history_database/history_database_20181103','history_database/history_database_20181031')
+
+history.all <- data.frame(matrix(ncol = 2, nrow = 0))
+colnames(sound.all) <- c('date.mili', 'code')
+
+for (i.hist in 1:length(file.list))
+{
+  history.read <- read.delim(file.list[[i.hist]], header=FALSE, sep=':', stringsAsFactors=FALSE) 
+  history.all <- rbind.data.frame(history.all, history.read)
+  
+  history.read<- NULL
+}
+
+history <- history.all %>% distinct() %>% filter(V1 > 1541359887621) %>% mutate(hist.date=as.POSIXct(as.numeric(V1)/1000, origin=as.Date('1970-01-01', "%Y-%m-%d"), format = "%Y-%m-%d %H:%M:%OS")) %>% select(hist.date, hist.text=V2) 
+history
+```
+
+
+```{r}
+rquery.wordcloud(x, type=c("text", "url", "file"), 
+        lang="english", excludeWords = NULL, 
+        textStemming = FALSE,  colorPalette="Dark2",
+        max.words=200)
+```
+
 
 
 ## 5.2 Personal Reflection
