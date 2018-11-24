@@ -299,20 +299,17 @@ url.footfall <- 'https://data.smartdublin.ie/dataset/8204be0a-6348-459e-96e9-65b
 download.file(url.footfall, 'footfall_ods.ods')
 sheet.names <- ods_sheets('pedestrianfootfall2013.ods')
 ```
+
 ```{r}
 #getting list of camera locations
 camera.locations <- read_ods('pedestrianfootfall2013.ods',sheet.names[1])[1]
 colnames(camera.locations) <- c('Loc') 
-camera.locations %>% filter(., grepl("Entrance Name:", Loc, fixed = TRUE)) 
-```
-
-```{r}
-sheet.names
+#camera.locations %>% filter(., grepl("Entrance Name:", Loc, fixed = TRUE)) 
 ```
 
 
 ```{r}
-#
+# reading in data from the selected cameras 
 camera1.name <- 'Entrance Name: Capel St at Mullen'
 camera2.name <- 'Entrance Name: Grafton St at M&S'
 
@@ -348,6 +345,9 @@ for(week.i in 1:length(sheet.names))
 ```
 
 ```{r}
+camera1.all
+camera2.all
+
 #all fields are character (they contained some text before using split), so must change all numeric characters to numeric
 camera1.all$Mon.In <- as.numeric(camera1.all$Mon.In)
 camera1.all$Mon.Out <- as.numeric(camera1.all$Mon.Out)
@@ -401,28 +401,32 @@ camera2.all$Week <- gsub('Week_6\\>', 'Week_06', camera2.all$Week)
 camera2.all$Week <- gsub('Week_7\\>', 'Week_07', camera2.all$Week)
 camera2.all$Week <- gsub('Week_8\\>', 'Week_08', camera2.all$Week)
 camera2.all$Week <- gsub('Week_9\\>', 'Week_09', camera2.all$Week)
+```
+
+```{r}
+camera1.all <- camera1.all %>% mutate(Mon=Mon.In+Mon.Out) %>% mutate(Tue=Tue.In+Tue.Out) %>% mutate(Wed=Wed.In+Wed.Out) %>% mutate(Thurs=Thurs.In+Thurs.Out) %>% mutate(Fri=Fri.In+Fri.Out) %>% mutate(Sat=Sat.In+Sat.Out) %>% mutate(Sun=Sun.In+Sun.Out) %>% mutate(All=Mon+Tue+Wed+Thurs+Fri+Sat+Sun) %>% mutate(Week.fact=as.factor(Week))
+
+camera2.all <- camera2.all %>% mutate(Mon=Mon.In+Mon.Out) %>% mutate(Tue=Tue.In+Tue.Out) %>% mutate(Wed=Wed.In+Wed.Out) %>% mutate(Thurs=Thurs.In+Thurs.Out) %>% mutate(Fri=Fri.In+Fri.Out) %>% mutate(Sat=Sat.In+Sat.Out) %>% mutate(Sun=Sun.In+Sun.Out) %>% mutate(All=Mon+Tue+Wed+Thurs+Fri+Sat+Sun) %>% mutate(Week.fact=as.factor(Week))
 
 camera1.all
+camera2.all
+```
+```{r fig.height=14, fig.width=14}
+camera1.sum.week <- camera1.all %>% group_by(Week.fact) %>% summarise(Footfall=sum(All)) %>% mutate(Camera = gsub("Entrance Name: ","", camera1.name))
+camera2.sum.week <- camera2.all %>% group_by(Week.fact) %>% summarise(Footfall=sum(All)) %>% mutate(Camera = gsub("Entrance Name: ","", camera2.name))
 ```
 
-```{r}
-summary(camera1.all)
-summary(camera2.all)
+The footfall in Capel Street (average per week over 2013 is `r mean(camera1.sum.week$Footfall)`) tends to be much lower than that in Grafton street (average per week over 2013 is `r mean(camera2.sum.week$Footfall)`), which would be expected as Grafton is a very busy shopping street and Capel Street would be expected to have less ttraffic. We can see the amoutnt of footfall over the course of the year in Figure X below.
+
+```{r fig.height=14, fig.width=14}
+ggplot(data=rbind(camera1.sum.week, camera2.sum.week), aes(x=Week.fact, y=Footfall, group=Camera, colour = Camera)) + geom_point() + geom_line() + facet_grid(rows=vars(Camera), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Week of Year 2013', y = 'Footfall', title='Footfall for weeks of year 2013')
 ```
 
 
 
 
-```{r}
-camera1.sum.week <- camera1.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
-camera2.sum.week <- camera2.all %>% group_by(Week) %>% summarise_if(., is.numeric, sum)
-camera1.sum.week
-camera1.sum.week[2:15]
-rowSums(camera1.sum.week[2:15], na.rm = TRUE)
-sum(camera1.sum.week[2:15])
 
-camera1.sum.week %>% group_by(Week) %>% mutate(x=sum())
-```
+
 
 
 ### Task 2.2
@@ -468,7 +472,7 @@ for (i in 1:12)
 
 ```{r}
 sound.all <- data.frame(matrix(ncol = 4, nrow = 0))
-colnames(sound.all) <- c('week', 'day.week', 'hour', 'mean.noise.level')
+colnames(sound.all) <- c('week', 'day.week', 'Time', 'mean.noise.level')
 
 for (i.month in 1:nrow(dates.df))
 {
@@ -500,8 +504,8 @@ sound.tidy$time <-  gsub(",","", sound.tidy$time)
 sound.tidy$noise.level <-  as.numeric(gsub(",","", sound.tidy$noise.level))
 sound.tidy$date.sound <-  as.Date(sound.tidy$date.sound, format='%d/%m/%Y')
 
-sound.tidy$hour <- format(strptime(sound.tidy$time,format='%H:%M:%S'), "%k")
-sound.tidy.summary <- sound.tidy %>% group_by(date.sound, hour) %>% summarise(mean.noise.level=mean(noise.level)) 
+sound.tidy$Time <- format(strptime(sound.tidy$time,format='%H:%M:%S'), "%k")
+sound.tidy.summary <- sound.tidy %>% group_by(date.sound, Time) %>% summarise(mean.noise.level=mean(noise.level)) 
 
 sound.tidy.summary$Week <- paste('Week', strftime(sound.tidy.summary$date.sound, "%V"), sep='_')
 sound.tidy.summary$day.week <- format(as.Date(sound.tidy.summary$date.sound), "%A") 
@@ -513,20 +517,45 @@ sound.tidy.all <- sound.tidy.summary[2:5]
 ```{r}
 sound.split <- split(sound.tidy.all, sound.tidy.all$day.week)
 
-sound.mon <- sound.split$Monday %>% select(., Week, hour, mon.noise=mean.noise.level)
-sound.tue <- sound.split$Tuesday %>% select(Week, hour, tue.noise=mean.noise.level)
-sound.wed <- sound.split$Wednesday %>% select(Week, hour, wed.noise=mean.noise.level)
-sound.thurs <- sound.split$Thursday %>% select(Week, hour, thurs.noise=mean.noise.level)
-sound.fri <- sound.split$Friday %>% select(Week, hour, fri.noise=mean.noise.level)
-sound.sat <- sound.split$Saturday %>% select(Week, hour, sat.noise=mean.noise.level)
-sound.sun <- sound.split$Sunday %>% select(Week, hour, sun.noise=mean.noise.level)
+sound.mon <- sound.split$Monday %>% select(., Week, Time, mon.noise=mean.noise.level)
+sound.tue <- sound.split$Tuesday %>% select(Week, Time, tue.noise=mean.noise.level)
+sound.wed <- sound.split$Wednesday %>% select(Week, Time, wed.noise=mean.noise.level)
+sound.thurs <- sound.split$Thursday %>% select(Week, Time, thurs.noise=mean.noise.level)
+sound.fri <- sound.split$Friday %>% select(Week, Time, fri.noise=mean.noise.level)
+sound.sat <- sound.split$Saturday %>% select(Week, Time, sat.noise=mean.noise.level)
+sound.sun <- sound.split$Sunday %>% select(Week, Time, sun.noise=mean.noise.level)
 
-sound.new <- sound.mon %>% full_join(sound.tue, by=c('Week', 'hour')) %>% full_join(sound.wed, by=c('Week', 'hour')) %>% full_join(sound.thurs, by=c('Week', 'hour')) %>% full_join(sound.fri, by=c('Week', 'hour')) %>% full_join(sound.sat, by=c('Week', 'hour')) %>% full_join(sound.sun, by=c('Week', 'hour')) %>% arrange(Week, hour)
+sound.new <- sound.mon %>% full_join(sound.tue, by=c('Week', 'Time')) %>% full_join(sound.wed, by=c('Week', 'Time')) %>% full_join(sound.thurs, by=c('Week', 'Time')) %>% full_join(sound.fri, by=c('Week', 'Time')) %>% full_join(sound.sat, by=c('Week', 'Time')) %>% full_join(sound.sun, by=c('Week', 'Time')) %>% arrange(Week, Time)  %>% mutate(Week.fact=as.factor(Week))
 
-sound.new 
+sound.new[is.na(sound.new)] <- 0
+
+sound.all <- sound.new %>% mutate(All=mon.noise+tue.noise+wed.noise+thurs.noise+fri.noise+sat.noise+sun.noise)
+sound.all
 ```
 
 
+```{r fig.height=14, fig.width=14}
+sound.week <- sound.all %>% group_by(Week.fact) %>% summarise(Sound_Level=sum(All))
+sound.week
+camera1.sum.week
+
+
+ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+
+ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+```
+
+```{r fig.height=14, fig.width=14}
+camera1.all.w12  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+camera1.all.w12
+
+
+sound.all.w12  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+camera1.all.w12
+sound.all.w12
+
+ggplot(data=rbind(camera1.all.w12, sound.all.w12), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+```
 
 
 
