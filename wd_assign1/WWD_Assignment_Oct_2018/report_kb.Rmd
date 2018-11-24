@@ -103,75 +103,48 @@ kable(bind_rows(prop.extreme, employ.extreme.con), digits = 2)
 ### 2.1 Summarise information available
 
 ```{r}
+# Getting list of available cities
 stations <- GET('https://api.jcdecaux.com/vls/v1/stations?apiKey=174980a157364085f718726daecb380b7aeaf5b4')
 http_type(stations)
 stations.df <- jsonlite::fromJSON(content(stations, 'text'), simplifyVector = TRUE)
-#count(stations.df, vars = 'contract_name')
+#stations.df %>% count(contract_name) %>% arrange(desc(n))
 ```
 
-As Dublin has quite a high number of stations and I'm most familiar with Dublin, I'll choose that.
+As Dublin has quite a high number of stations and I'm most familiar with Dublin so I'll choose that.
 
 ```{r}
+#Pulling in the Dublin bikes data
 bike <- GET('https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=174980a157364085f718726daecb380b7aeaf5b4')
 http_type(bike)
 bike.df <- jsonlite::fromJSON(content(bike, 'text'), simplifyVector = TRUE)
 ```
-```{r}
-sum.bike <- summary(bike.df)
-```
-
-
-There are a total of `r nrow(bike.df)` bike stands in the Dublin bike data, they are numbered `r bike.df[1,1]` to `r bike.df[nrow(bike.df),1]`, there is no bike stand number 20. There are `r ncol(bike.df)` columns in the dataset. 
-Cannot extract column from dataframe!
-In most cases the name and address are the same, except for - strip punctuation and match
-
-All bikes are withing x of O'connel street bridge.
-
-The number of available bikes and available bike stands are also available
-
-The status of whether the bike stands are open or closed is also given. As of now(`r Sys.time()`), all bike stands are `r unique(bike.df$status)`.Payment is only available at some bike stands, 
-
-How many NAs per column, is the dataset relatively complete?
-Min max of each column, any weird data?
-aNY COLUMNS NOT USEFUL? BONUS
-
-Average number of bike stands
-Biggest and smallest stations
-
-Proportion that you can pay at
-Are the paying ones bigger or smaller?
-
-Average number of bikes and stands available
-
-Visualise some data?
-```{r}
-#filter(bike.df, banking==FALSE)
-#bike.df[bike.df$banking==F]
-
-#bike.df[bike.df$address=='Smithfield North']
-
-#bike.df$address=='Smithfield North'
-
-#bike.df$banking
-```
-
 
 ```{r}
-bike.df <- bike.df[order(bike.df$number),] 
-#bike.df
+# Creating some aggregated dataframes for brevity in inline code
+bike.df.match <- bike.df[tolower(bike.df$name) != tolower(bike.df$address), ]
+avail.bikes <- rbind(bike.df.clean %>% select(address, Num_bikes=available_bike_stands) %>% mutate(Bike_label = 'Available Bike Stands'), bike.df.clean %>% select(address, Num_bikes=available_bikes) %>% mutate(Bike_label = 'Available Bikes'))
 ```
 
-```{r}
-str(bike.df)
-bike.df
+At the time that the data was pulled via the API, `r Sys.time()`, all `r nrow(bike.df)` Dublin bike stands were `r count(bike.df, status)[1]`. The bike stands are numbered `r min(bike.df$number)` to `r max(bike.df$number)`, there is no bike stand number 20. 
+
+People generally access Dublin bikes through a subscription service. For ???25 per year, you get a card that allows you unlimited bike rides of 30mins or less. It is possible to buy a 3 day pass with a credit card but this isn't available at the majority of stations. There are payment facilities available at `r count(bike.df, banking) %>% filter(banking==TRUE) %>% select(n)` of the `r nrow(bike.df)` bike stations.
+
+There are `r ncol(bike.df)` columns in the dataset but several are redundant. As we used contract name to chose the data from Dublin, this column doesn't give us any additional information. The name and address columns are identical in most cases. There are 3 cases where they differ but these are either due to spelling or punctuation differences, name:`r bike.df.match[bike.df.match$number==50,]$name`, address: `rbike.df.match[bike.df.match$number==50,]$address` and name:`r bike.df.match[bike.df.match$number==58,]$name`, address: `rbike.df.match[bike.df.match$number==58,]$address`. Bike stand number 5 is at an intersection and the name, `r bike.df.match[bike.df.match$number==5,]$name` and address: `r bike.df.match[bike.df.match$number==5,]$address` are each road in the intersection. Therefore for our purposes, we will just use the address field as it's more readable. The bonus field also doesn't appear to add any information, it is `r bike.df$bonus[1]`in every case. The latitud and longitude of each station is also provided. Aside from the addition of some unneeded fields, the dataset is complete, there are no NAs in fields of interest.
+
+The number of bike stands per station vary between`r min(bike.df$bike_stands)` and `r max(bike.df$bike_stands)`, with an average of `r mean(bike.df$bike_stands)`. At this point in time, there are `r bike.df.clean %>% filter(available_bikes==0) %>% nrow()` stations with no available bikes. There are `r bike.df.clean %>% filter(available_bike_stands==0) %>% nrow()` stations with no free bike stands, so someone would be unable to return a bike they had taken out. There is an average of `r bike.df.clean %>% summarise(mean(available_bikes))` available bikes and `r bike.df.clean %>% summarise(mean(available_bike_stands))` available bike stands per station. The number of available bikes and stands for each station can be seen in the figure below. As the total number of bike stands is the sum of the available bike and available stands, the size of the station can also be seen in the figure below.
+
+```{r fig.height=14, fig.width=12}
+ggplot(avail.bikes, aes(fill=Bike_label, y=Num_bikes, x=address)) + geom_bar(stat="identity") +
+coord_flip() + labs(x = 'Stations', y = 'Number of available bikes or stands', title='Figure X: Availabiliy of bikes or stands at Dublin bike stations')
 ```
+
 
 ### 2.2 Plot Dublin Bikes Data
 
-If someone quickly needed to get a Dublin bike, but didn't have a Dublin bike card already set up, they would need a bike station with payment facilities. Below is a plot of the number of available bikes by station and whether the bike station takes payment.
+If someone quickly needed to get a Dublin bike, but didn't have a Dublin bike card already set up, they would need a bike station with payment facilities in order to buy a 3 day pass. Below is a plot of the number of available bikes by station and whether the bike station takes payment.
 
 ```{r , fig.height=14, fig.width=12}
-qplot(available_bikes, name, data = bike.df , colour = banking, size=I(3))
+qplot(available_bikes, address, data = bike.df , colour = banking, size=I(3))
 ```
 
 ## Task 3 Dublin Bus
@@ -195,7 +168,7 @@ There are `r length(unique(routes.df$route_id))` unique routes in this dataset, 
 ```{r fig.width=14, fig.height=10}
 route.num.trip <- left_join(trips.df, routes.df, by = 'route_id') %>% mutate(Service=case_when(service_id == 2 ~ 'Sunday/Bank Holiday', service_id == 1 ~ 'Weekday',  service_id == 3 ~ 'Saturday')) %>% select(Service, route_short_name, trip_id) %>% count(., Service, route_short_name)
 
-ggplot(data=route.num.trip, aes(x=reorder(route_short_name, -n), y=n)) + facet_grid(rows=vars(Service), scale = 'fixed') + geom_histogram(stat = 'identity', fill='darkorchid3', colour='black') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+ggplot(data=route.num.trip, aes(x=reorder(route_short_name, -n), y=n)) + facet_grid(rows=vars(Service), scale = 'fixed') + geom_histogram(stat = 'identity', fill='darkorchid3', colour='black', alpha=0.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
 ```
 
 
@@ -257,7 +230,7 @@ dublin_bb <- c(left = (min(stops.df$stop_lon) - 0.01),
 
 dublin_stamen <- get_stamenmap(bbox = dublin_bb, zoom = 11,  maptype = 'toner-lite')
 
-ggmap(dublin_stamen, legend = 'right') + geom_point(data = lat.long.combo, mapping = aes(x = Longitude, y = Latitude, na.rm=TRUE, colour = Route), size = 0.6, alpha = .5) +ggtitle('Figure X: Map of Dublin Bus Routes') + labs(x='Longitude', y='Latitude')
+ggmap(dublin_stamen, legend = 'right') + geom_point(data = lat.long.combo, mapping = aes(x = Longitude, y = Latitude, na.rm=TRUE, colour = Route, size=Route, alpha=Route)) +ggtitle('Figure X: Map of Dublin Bus Routes') + labs(x='Longitude', y='Latitude') + scale_colour_manual(values = c("red", "springgreen3", "deepskyblue3")) + scale_size_manual(values = c(2, 1.8, 0.7)) + scale_alpha_manual(values = c(1, 1, 0.5))
 ```
 
 The units of distance travelled are not specified in the dataset. The distance on the 16 route from the George's Street stop to the Redmond's Hill stop is given in the dataset is `r dist.calc`. The distance between these two stops according to Google maps is 500m, so it appears that the unit of distance is meters. The mean and median route length are very similar at `r mean(route.length$Dist.mean)` km and `r median(route.length$Dist.mean)` km respectively. The shortest route is Route `r filter(route.length, Dist.mean==min(Dist.mean))$route_short_name`, `r filter(route.length, Dist.mean==min(Dist.mean))$route_long_name`, at `r filter(route.length, Dist.mean==min(Dist.mean))$Dist.mean` km. The longest route is Route `r filter(route.length, Dist.mean==max(Dist.mean))$route_short_name`, `r filter(route.length, Dist.mean==max(Dist.mean))$route_long_name`, at `r filter(route.length, Dist.mean==max(Dist.mean))$Dist.mean` km. Both can ben seen in Figure X above.
@@ -314,7 +287,7 @@ dublin_intersect_bb <- c(left = (min(stops.intersect$Longitude) - 0.01),
 
 dublin_intersect_stamen <- get_stamenmap(bbox = dublin_intersect_bb, zoom = 11,  maptype = 'toner-lite')
 
-ggmap(dublin_intersect_stamen, legend = 'right') + geom_point(data = intersect.routes, mapping = aes(x = Longitude, y = Latitude, na.rm=TRUE, colour = Route), size = 0.6, alpha = .5) +ggtitle('Figure X: Map of Dublin Bus Routes') + labs(x='Longitude', y='Latitude')
+ggmap(dublin_intersect_stamen, legend = 'right') + geom_point(data = intersect.routes, mapping = aes(x = Longitude, y = Latitude, na.rm=TRUE, colour = Route, size=Route, alpha=Route)) +ggtitle('Figure X: Map of Dublin Bus Routes') + labs(x='Longitude', y='Latitude') + scale_colour_manual(values = c("deepskyblue3", "purple")) + scale_size_manual(values = c(1, 1)) + scale_alpha_manual(values = c(0.5, 1))
 ```
 
 
@@ -587,15 +560,9 @@ word.freq <- data.frame(table(unlist(strsplit(tolower(hist.simple), " ")))) %>% 
 hist.count <- count(history, hist.date.time)
 ```
 
-I ran a total of `r nrow(history)` lines of code, which contained `r sum(stri_count_words(history$hist.text))` words. 
+I ran a total of `r nrow(history)` lines of code, which contained `r sum(stri_count_words(history$hist.text))` words. I ran on average, `r summarise(hist.count, mean(n))` commands an hour, or `r summarise(hist.count, mean(n))/60` per minute, with a median of `r summarise(hist.count, median(n))/60` commands per minute and a maximum of `r summarise(hist.count, max(n))/60` per minute. As I was running a lot of for loops, this high rate isn't unexpected.
 
-I ran on average, `r summarise(hist.count, mean(n))` commands an hour, or `r summarise(hist.count, mean(n))/60` per minute, with a median of `r summarise(hist.count, median(n))/60` commands per minute and a maximum of `r summarise(hist.count, max(n))/60` per minute. As I was running a lot of for loops, this high rate isn't unexpected.
-
-The most frequently run commands involved, as expected, assignment and piping:, <- at `r word.freq %>% filter(Var1=='<-') %>% select(Freq)` times, %>% at `r word.freq %>% filter(Var1=='%>%') %>% select(Freq)` times and = at `r word.freq %>% filter(Var1=='=') %>% select(Freq)` times. 
-
-The most common R functions were distinct() at `r word.freq %>% filter(Var1=='distinct()') %>% select(Freq)` and nrow at `r word.freq %>% filter(Var1=='nrow') %>% select(Freq)`, which I found a bit surprising until I realised that I use nrow in the footfall loop to read in the data and I used distinct() in the bus route data, which I had a bit of trouble with.
-
-The most common variables were the column names I gave to the footfall columns such as mon.in, mon.out etc, at`r word.freq %>% filter(Var1=='fri.in') %>% select(Freq)` each. As these run inside a loop to read in all the footfall data, it's not surprising that these were the most common.
+The most frequently run commands involved, as expected, assignment and piping:, <- at `r word.freq %>% filter(Var1=='<-') %>% select(Freq)` times, %>% at `r word.freq %>% filter(Var1=='%>%') %>% select(Freq)` times and = at `r word.freq %>% filter(Var1=='=') %>% select(Freq)` times. The most common R functions were distinct() at `r word.freq %>% filter(Var1=='distinct()') %>% select(Freq)` and nrow at `r word.freq %>% filter(Var1=='nrow') %>% select(Freq)`, which I found a bit surprising until I realised that I use nrow in the footfall loop to read in the data and I used distinct() in the bus route data, which I had a bit of trouble with. The most common variables were the column names I gave to the footfall columns such as mon.in, mon.out etc, at`r word.freq %>% filter(Var1=='fri.in') %>% select(Freq)` each. As these run inside a loop to read in all the footfall data, it's not surprising that these were the most common.
 
 As I've been trying to get better at using the built in R help, I measured the number of times I used the help function by looking at the number of times '?' was used. I probably still have to get better at using it, as you can see from the figure below.
 
@@ -618,7 +585,13 @@ quality, emotions, productivity. Investigate - determine the source of this (pre
 Incorporate - based on the investigation, is there a lesson to absorb (future)?
 Improve - the goal of reflection.
 
-I decided to approach the project by attempting each problem until I got stuck and then moving on to the next one if I was stuck for more than 20 minutes or so, and then going back to the start to finish the problems to the required standard. I've learned from previous experience that it's easier for me to work on improving a question rather than starting something from scratch. By looking at each question in some detail at the start, is also allows ideas to perculate, so when you come back to it later, you might ahve solved the problem or have a new perspective. 
+The length of the project was the main challenge for me. Some of the parts were quite complex but I enjoyed figuring them out, my main issue was finding time to do everything.
+
+I decided to approach the project by attempting each problem until I got stuck and then moving on to the next one if I was stuck for more than 20 minutes or so, and then going back to the start to finish the problems to the required standard. I've learned from previous experience that it's easier for me to work on improving a question rather than starting something from scratch. By looking at each question in some detail at the start, is also allows ideas to perculate, so when you come back to it later, you might ahve solved the problem or have a new perspective. When I actually stuck to this, it worked well, but a few times I kept at something when I just should have given up and moved on, at least for the moment. Towards the end of the assignment, I made a Trello to do list whch had the 'minimum viable answer' for each task, so I would stick to doing that. I ca go back and improve it later.
+
+I found some of the tasks challenging, like finding a dataset to compare to the footfall one, mainly because the footfall data was from 2013 and it was difficult to find an easily accessible dataset from that time.
+
+ 
 
 It's also easy to get stuck down a rabbit hole of trying to solve a particular technical problem but then when you looka t it with a fresh mind, you realised that problem didn't need to be solved at all for the question.
 
