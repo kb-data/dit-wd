@@ -1,0 +1,1075 @@
+1543163844504:lat.long.combo <- rbind(lat.long.all, lat.long.longest, lat.long.shortest)
+1543163844512:# store bounding box coordinates - add a small amount so box extends slightly beyond the furthermost stop
+1543163844514:dublin_bb <- c(left = (min(stops.df$stop_lon) - 0.01),
+1543163844516:bottom = (min(stops.df$stop_lat) - 0.01),
+1543163844518:right = (max(stops.df$stop_lon) + 0.01),
+1543163844520:top = (max(stops.df$stop_lat) + 0.01))
+1543163844524:dublin_stamen <- get_stamenmap(bbox = dublin_bb, zoom = 11,  maptype = 'toner-lite')
+1543163845381:ggmap(dublin_stamen, legend = 'right') + geom_point(data = lat.long.combo, mapping = aes(x = Longitude, y = Latitude, na.rm=TRUE, colour = Route, size=Route, alpha=Route)) +ggtitle('Figure 6: Map of Dublin Bus Routes') + labs(x='Longitude', y='Latitude') + scale_colour_manual(values = c("red", "springgreen3", "deepskyblue3")) + scale_size_manual(values = c(2, 1.8, 0.7)) + scale_alpha_manual(values = c(1, 1, 0.5))
+1543163915794:# store bounding box coordinates - add a small amount so box extends slightly beyond the furthermost stop
+1543163915794:dublin_intersect_bb <- c(left = (min(stops.intersect$Longitude) - 0.01),
+1543163915794:bottom = (min(stops.intersect$Latitude) - 0.01),
+1543163915794:right = (max(stops.intersect$Longitude) + 0.01),
+1543163915794:top = (max(stops.intersect$Latitude) + 0.01))
+1543163915810:dublin_intersect_stamen <- get_stamenmap(bbox = dublin_intersect_bb, zoom = 11,  maptype = 'toner-lite')
+1543163916400:ggmap(dublin_intersect_stamen, legend = 'right') + geom_point(data = intersect.routes, mapping = aes(x = Longitude, y = Latitude, na.rm=TRUE, colour = Route, size=Route, alpha=Route)) +ggtitle(paste('Figure 7: Map of Dublin Bus Routes intersecting with Route ',home.route)) + labs(x='Longitude', y='Latitude') + scale_colour_manual(values = c("deepskyblue3", "purple")) + scale_size_manual(values = c(1, 1)) + scale_alpha_manual(values = c(0.5, 1))
+1543163978792:#loading in the footfall data
+1543163978792:url.footfall <- 'https://data.smartdublin.ie/dataset/8204be0a-6348-459e-96e9-65bb75600ec3/resource/384fe47a-2f25-4f52-8fc5-8e61899951e9/download/pedestrianfootfall2013.ods'
+1543163978792:download.file(url.footfall, 'footfall_ods.ods')
+1543163979484:sheet.names <- ods_sheets('pedestrianfootfall2013.ods')
+1543167035445:ggplot(data=rbind(camera1.sum.week, camera2.sum.week), aes(x=Week.fact, y=Footfall, group=Camera, colour = Camera)) + geom_point() + geom_line() + facet_grid(rows=vars(Camera), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Week of Year 2013', y = 'Footfall', title='Figure 8: Footfall for weeks of year 2013') + scale_y_continuous(labels = comma)
+1543167054802:library(scales)
+1543167057307:ggplot(data=rbind(camera1.sum.week, camera2.sum.week), aes(x=Week.fact, y=Footfall, group=Camera, colour = Camera)) + geom_point() + geom_line() + facet_grid(rows=vars(Camera), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Week of Year 2013', y = 'Footfall', title='Figure 8: Footfall for weeks of year 2013') + scale_y_continuous(labels = comma)
+1543167079222:home.route <- 49
+1543167079222:bus.home <- bus.join %>% filter(route_short_name==home.route, Service=='Weekday')
+1543167106673:ggplot(data=rbind(camera1.sum.week, camera2.sum.week), aes(x=Week.fact, y=Footfall, group=Camera, colour = Camera)) + geom_point() + geom_line() + facet_grid(rows=vars(Camera), scales='free_y') + theme(axis.text.x = element_text(angle = 70, hjust = 1)) + labs(x = 'Week of Year 2013', y = 'Footfall', title='Figure 8: Footfall for weeks of year 2013') + scale_y_continuous(labels = comma)
+1543167113064:ggplot(data=rbind(camera1.sum.week, camera2.sum.week), aes(x=Week.fact, y=Footfall, group=Camera, colour = Camera)) + geom_point() + geom_line() + facet_grid(rows=vars(Camera), scales='free_y') + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + labs(x = 'Week of Year 2013', y = 'Footfall', title='Figure 8: Footfall for weeks of year 2013') + scale_y_continuous(labels = comma)
+1543167301706:camera1.all
+1543167378213:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543167389556:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) $>$ summarise(max)
+1543167395688:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max)
+1543167426285:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon))
+1543167437988:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue))
+1543167483096:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun))
+1543167523149:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun))))
+1543167530814:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun))
+1543167544896:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun))
+1543167544909:camera2.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun))
+1543167598321:c1 <- camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun))
+1543167598321:max(c1)
+1543167659189:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% filter(Mon==max(c1))
+1543167683125:c1 <- camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543167683127:c1
+1543167699373:c1 <- camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) #%>% max()
+1543167699373:max(c1)
+1543167737136:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% filter(Mon==c1max || Tue==c1max)
+1543167741505:c1max <- camera1.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543167741508:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% filter(Mon==c1max || Tue==c1max)
+1543167769684:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% filter(Mon==c1max || Tue==c1max || Wed==c1max || Thurs==c1max || Sat==c1max || Sun==c1max)
+1543167792657:camera1.all %>% select(Week,Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun) %>% filter(Mon==c1max || Tue==c1max || Wed==c1max || Thurs==c1max || Fri==c1max || Sat==c1max || Sun==c1max)
+1543167797361:c1max
+1543167808040:camera1.all
+1543167824918:camera1.all%>% filter(Tue==141)
+1543167838166:c1max <- camera1.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) #%>% max()
+1543167838181:c1max
+1543167869962:camera1.all%>% filter(Sat==1869)
+1543167910716:camera1.all %>% filter(Mon==c1max || Tue==c1max || Wed==c1max || Thurs==c1max || Fri==c1max || Sat==c1max || Sun==c1max)
+1543167922788:camera1.all%>% filter(Sat==1869)
+1543167922802:c1max <- camera1.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543167922960:c1max
+1543167922964:camera1.all %>% filter(Mon==c1max || Tue==c1max || Wed==c1max || Thurs==c1max || Fri==c1max || Sat==c1max || Sun==c1max)
+1543167960733:camera1.all%>% filter(Sat==1869 || Fri==1869)
+1543167963971:camera1.all%>% filter(Sat==1869 | Fri==1869)
+1543167984128:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max)
+1543168185554:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168246764:c1max <- camera1.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543168246764:c1min <- camera1.all %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543168246764:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168298863:c2max <- camera2.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543168298874:c2min <- camera2.all %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543168299032:camera2.all %>% filter(Mon==c2max | Tue==c2max | Wed==c2max | Thurs==c2max | Fri==c2max | Sat==c2max | Sun==c2max | Mon==c2max | Tue==c2min | Wed==c2min | Thurs==c2min | Fri==c2min | Sat==c2min | Sun==c2min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168379006:#c1max <-
+1543168379008:camera1.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)) #%>% max()
+1543168462868:summarise(camera1.all, max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168496523:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==summarise(camera1.all, max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)) | min(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==summarise(camera1.all, min(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)) ) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168531202:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==summarise(camera1.all, max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)) | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==summarise(camera1.all, min(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)) ) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168543268:summarise(camera1.all, max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)
+1543168548597:summarise(camera1.all, max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168569938:camera1.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168600049:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==camera1.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)) | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==camera1.all %>% summarise(min(Mon+Tue+Wed+Thurs+Fri+Sat+Sun)) ) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168616007:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168670919:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168694314:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c1max.week) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168699854:c1max.week <- camera1.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168699860:c1min.week <- camera1.all %>% summarise(min(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168701881:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c1max.week) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168710050:c1max.week
+1543168715336:c1max.week[1]
+1543168721570:c1max.week[1]
+1543168728515:c1max.week[[1]]
+1543168747403:c1max.week <- camera1.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))[[1]]
+1543168754314:c1max.week <- camera1.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))[[1]]
+1543168765863:camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max | Mon==c1max | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c1max.week[[1]]) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168832296:camera1.all %>% filter( (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c1max.week[[1]] | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c2max.week[[1]]) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168843195:camera1.all %>% filter( (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c1max.week[[1]] | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==cmin.week[[1]]) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168849993:camera1.all %>% filter( (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c1max.week[[1]] | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c1min.week[[1]]) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168926398:c2max <- camera2.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543168926574:c2min <- camera2.all %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543168926581:c2max.week <- camera2.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168926587:c2min.week <- camera2.all %>% summarise(min(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168926593:camera2.all %>% filter(Mon==c2max | Tue==c2max | Wed==c2max | Thurs==c2max | Fri==c2max | Sat==c2max | Sun==c2max | Mon==c2max | Tue==c2min | Wed==c2min | Thurs==c2min | Fri==c2min | Sat==c2min | Sun==c2min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c2max.week[[2]]) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168944176:c2max <- camera2.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543168944180:c2min <- camera2.all %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543168944180:c2max.week <- camera2.all %>% summarise(max(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168944180:c2min.week <- camera2.all %>% summarise(min(Mon+Tue+Wed+Thurs+Fri+Sat+Sun))
+1543168944195:camera2.all %>% filter(Mon==c2max | Tue==c2max | Wed==c2max | Thurs==c2max | Fri==c2max | Sat==c2max | Sun==c2max | Mon==c2max | Tue==c2min | Wed==c2min | Thurs==c2min | Fri==c2min | Sat==c2min | Sun==c2min | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c2max.week[[1]]) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543168944397:camera2.all %>% filter( (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c2max.week[[1]] | (Mon+Tue+Wed+Thurs+Fri+Sat+Sun)==c2min.week[[1]]) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543169025556:c1max <- camera1.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543169025560:c1max.result <- camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543169025560:c1max
+1543169025581:c1max.result
+1543169319957:c1max.result[Week]
+1543169327748:c1max.result$Week
+1543169343911:c1max.result$Time
+1543169437057:camera1.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun))
+1543169478870:?select_if
+1543169654241:camera1.all[,(camera1.all[,]) == c1max]
+1543169665767:camera1.all[,(camera1.all) == c1max]
+1543169675202:(camera1.all) == c1max
+1543169686767:camera1.all[(camera1.all) == c1max]
+1543169704393:camera1.all[(camera1.all) == c1max,]
+1543169727930:camera1.all[,(camera1.all) == c1max]
+1543169743161:(camera1.all) == c1max
+1543169824580:c1max <- camera1.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543169824587:c1max.result <- camera1.all %>% filter(Mon==c1max | Tue==c1max | Wed==c1max | Thurs==c1max | Fri==c1max | Sat==c1max | Sun==c1max) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543169824597:c1max
+1543169824603:c1max.result
+1543170039504:if(camera1.all %>% summarise(max(Mon))==c1max)
+1543170039507:{
+1543170039509:c1max.day='Monday'
+1543170039511:} else if (camera1.all %>% summarise(max(Tue))==c1max){
+1543170039514:c1max.day='Tuesday'
+1543170039667:} else if (camera1.all %>% summarise(max(Wed))==c1max){
+1543170039670:c1max.day='Wednesday'
+1543170039671:} else if (camera1.all %>% summarise(max(Thurs))==c1max){
+1543170039673:c1max.day='Thursday'
+1543170039675:} else if (camera1.all %>% summarise(max(Fri.In))==c1max){
+1543170039676:c1max.day='Friday'
+1543170039678:} else if (camera1.all %>% summarise(max(Sat.In))==c1max){
+1543170039679:c1max.day='Saturday'
+1543170039681:} else if (camera1.all %>% summarise(max(Sun.In))==c1max){
+1543170039683:c1max.day='Sunday'
+1543170039685:}
+1543170039696:c1max.day
+1543170063688:if(camera1.all %>% summarise(max(Mon))==c1max)
+1543170063690:{
+1543170063692:c1max.day <- 'Monday'
+1543170063694:} else if (camera1.all %>% summarise(max(Tue))==c1max){
+1543170063696:c1max.day <- 'Tuesday'
+1543170063850:} else if (camera1.all %>% summarise(max(Wed))==c1max){
+1543170063853:c1max.day <- 'Wednesday'
+1543170063854:} else if (camera1.all %>% summarise(max(Thurs))==c1max){
+1543170063856:c1max.day <- 'Thursday'
+1543170063858:} else if (camera1.all %>% summarise(max(Fri.In))==c1max){
+1543170063859:c1max.day <- 'Friday'
+1543170063861:} else if (camera1.all %>% summarise(max(Sat.In))==c1max){
+1543170063862:c1max.day <- 'Saturday'
+1543170063864:} else if (camera1.all %>% summarise(max(Sun.In))==c1max){
+1543170063866:c1max.day <- 'Sunday'
+1543170063868:}
+1543170063879:c1max.day
+1543170097084:camera1.all %>% summarise(max(Thurs))==c1max
+1543170102173:camera1.all %>% summarise(max(Fri))==c1max
+1543170107844:camera1.all %>% summarise(max(Sat))==c1max
+1543170139660:if(camera1.all %>% summarise(max(Mon))==c1max)
+1543170139663:{
+1543170139665:c1max.day <- 'Monday'
+1543170139668:} else if (camera1.all %>% summarise(max(Tue))==c1max){
+1543170139671:c1max.day <- 'Tuesday'
+1543170139674:} else if (camera1.all %>% summarise(max(Wed))==c1max){
+1543170139676:c1max.day <- 'Wednesday'
+1543170139678:} else if (camera1.all %>% summarise(max(Thurs))==c1max){
+1543170139680:c1max.day <- 'Thursday'
+1543170139834:} else if (camera1.all %>% summarise(max(Fri))==c1max){
+1543170139836:c1max.day <- 'Friday'
+1543170139838:} else if (camera1.all %>% summarise(max(Sat))==c1max){
+1543170139839:c1max.day <- 'Saturday'
+1543170139841:} else if (camera1.all %>% summarise(max(Sun))==c1max){
+1543170139842:c1max.day <- 'Sunday'
+1543170139844:}
+1543170139855:c1max.day
+1543170264908:c1min <- camera1.all %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170264914:c1min.result <- camera1.all %>% filter(Mon==c1min | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170264926:if(camera1.all %>% summarise(min(Mon))==c1min)
+1543170264928:{
+1543170264930:c1min.day <- 'Monday'
+1543170264932:} else if (camera1.all %>% summarise(min(Tue))==c1min){
+1543170265084:c1min.day <- 'Tuesday'
+1543170265086:} else if (camera1.all %>% summarise(min(Wed))==c1min){
+1543170265088:c1min.day <- 'Wednesday'
+1543170265090:} else if (camera1.all %>% summarise(min(Thurs))==c1min){
+1543170265091:c1min.day <- 'Thursday'
+1543170265093:} else if (camera1.all %>% summarise(min(Fri))==c1min){
+1543170265095:c1min.day <- 'Friday'
+1543170265096:} else if (camera1.all %>% summarise(min(Sat))==c1min){
+1543170265098:c1min.day <- 'Saturday'
+1543170265100:} else if (camera1.all %>% summarise(min(Sun))==c1min){
+1543170265101:c1min.day <- 'Sunday'
+1543170265103:}
+1543170265108:c1min
+1543170265114:c1min.result
+1543170265123:c1min.day
+1543170351073:c1min <- camera1.all %>% slice(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170351081:c1min.result <- camera1.all %>% filter(Mon==c1min | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170351244:if(camera1.all %>% summarise(min(Mon))==c1min)
+1543170351247:{
+1543170351248:c1min.day <- 'Monday'
+1543170351250:} else if (camera1.all %>% summarise(min(Tue))==c1min){
+1543170351252:c1min.day <- 'Tuesday'
+1543170351254:} else if (camera1.all %>% summarise(min(Wed))==c1min){
+1543170351256:c1min.day <- 'Wednesday'
+1543170351257:} else if (camera1.all %>% summarise(min(Thurs))==c1min){
+1543170351259:c1min.day <- 'Thursday'
+1543170351261:} else if (camera1.all %>% summarise(min(Fri))==c1min){
+1543170351262:c1min.day <- 'Friday'
+1543170351264:} else if (camera1.all %>% summarise(min(Sat))==c1min){
+1543170351265:c1min.day <- 'Saturday'
+1543170351267:} else if (camera1.all %>% summarise(min(Sun))==c1min){
+1543170351269:c1min.day <- 'Sunday'
+1543170351271:}
+1543170374443:camera1.all %>% slice(Week!='Week_01')
+1543170416612:camera1.all %>% filter(Week!='Week_01')
+1543170457746:c1min <- camera1.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170457750:c1min.result <- camera1.all %>% filter(Mon==c1min | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170457765:if(camera1.all %>% summarise(min(Mon))==c1min)
+1543170457767:{
+1543170457769:c1min.day <- 'Monday'
+1543170457771:} else if (camera1.all %>% summarise(min(Tue))==c1min){
+1543170457772:c1min.day <- 'Tuesday'
+1543170457774:} else if (camera1.all %>% summarise(min(Wed))==c1min){
+1543170457776:c1min.day <- 'Wednesday'
+1543170457777:} else if (camera1.all %>% summarise(min(Thurs))==c1min){
+1543170457779:c1min.day <- 'Thursday'
+1543170457781:} else if (camera1.all %>% summarise(min(Fri))==c1min){
+1543170457783:c1min.day <- 'Friday'
+1543170457784:} else if (camera1.all %>% summarise(min(Sat))==c1min){
+1543170457786:c1min.day <- 'Saturday'
+1543170457788:} else if (camera1.all %>% summarise(min(Sun))==c1min){
+1543170457789:c1min.day <- 'Sunday'
+1543170457791:}
+1543170481959:camera1.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170489042:camera1.all %>% filter(Week!='Week_01') #%>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170517629:c1min <- camera1.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170517804:c1min.result <- camera1.all %>% filter(Mon==c1min | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170517815:if(camera1.all %>% summarise(min(Mon))==c1min)
+1543170517817:{
+1543170517819:c1min.day <- 'Monday'
+1543170517820:} else if (camera1.all %>% summarise(min(Tue))==c1min){
+1543170517822:c1min.day <- 'Tuesday'
+1543170517823:} else if (camera1.all %>% summarise(min(Wed))==c1min){
+1543170517825:c1min.day <- 'Wednesday'
+1543170517826:} else if (camera1.all %>% summarise(min(Thurs))==c1min){
+1543170517828:c1min.day <- 'Thursday'
+1543170517829:} else if (camera1.all %>% summarise(min(Fri))==c1min){
+1543170517831:c1min.day <- 'Friday'
+1543170517832:} else if (camera1.all %>% summarise(min(Sat))==c1min){
+1543170517834:c1min.day <- 'Saturday'
+1543170517835:} else if (camera1.all %>% summarise(min(Sun))==c1min){
+1543170517837:c1min.day <- 'Sunday'
+1543170517838:}
+1543170517843:c1min
+1543170517849:c1min.result
+1543170517858:c1min.day
+1543170546112:c1min <- camera1.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170546120:c1min.result <- camera1.all %>% filter(Week!='Week_01') %>% filter(Mon==c1min | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170546127:if(camera1.all %>% summarise(min(Mon))==c1min)
+1543170546127:{
+1543170546127:c1min.day <- 'Monday'
+1543170546127:} else if (camera1.all %>% summarise(min(Tue))==c1min){
+1543170546127:c1min.day <- 'Tuesday'
+1543170546302:} else if (camera1.all %>% summarise(min(Wed))==c1min){
+1543170546304:c1min.day <- 'Wednesday'
+1543170546306:} else if (camera1.all %>% summarise(min(Thurs))==c1min){
+1543170546307:c1min.day <- 'Thursday'
+1543170546309:} else if (camera1.all %>% summarise(min(Fri))==c1min){
+1543170546310:c1min.day <- 'Friday'
+1543170546312:} else if (camera1.all %>% summarise(min(Sat))==c1min){
+1543170546314:c1min.day <- 'Saturday'
+1543170546315:} else if (camera1.all %>% summarise(min(Sun))==c1min){
+1543170546317:c1min.day <- 'Sunday'
+1543170546319:}
+1543170546323:c1min
+1543170546330:c1min.result
+1543170546338:c1min.day
+1543170688022:c2max <- camera2.all %>% summarise(max(Mon), max(Tue), max(Wed), max(Thurs), max(Fri), max(Sat), max(Sun)) %>% max()
+1543170688027:c2max.result <- camera2.all %>% filter(Mon==c2max | Tue==c2max | Wed==c2max | Thurs==c2max | Fri==c2max | Sat==c2max | Sun==c2max) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170688027:if(camera2.all %>% summarise(max(Mon))==c2max)
+1543170688027:{
+1543170688027:c2max.day <- 'Monday'
+1543170688044:} else if (camera2.all %>% summarise(max(Tue))==c2max){
+1543170688045:c2max.day <- 'Tuesday'
+1543170688047:} else if (camera2.all %>% summarise(max(Wed))==c2max){
+1543170688049:c2max.day <- 'Wednesday'
+1543170688051:} else if (camera2.all %>% summarise(max(Thurs))==c2max){
+1543170688053:c2max.day <- 'Thursday'
+1543170688055:} else if (camera2.all %>% summarise(max(Fri))==c2max){
+1543170688056:c2max.day <- 'Friday'
+1543170688058:} else if (camera2.all %>% summarise(max(Sat))==c2max){
+1543170688060:c2max.day <- 'Saturday'
+1543170688062:} else if (camera2.all %>% summarise(max(Sun))==c2max){
+1543170688063:c2max.day <- 'Sunday'
+1543170688065:}
+1543170688074:c2max
+1543170688080:c2max.result
+1543170688087:c2max.day
+1543170803055:c2min <- camera2.all %>% filter(Week!='Week_02') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170803060:c2min.result <- camera2.all %>% filter(Week!='Week_02') %>% filter(Mon==c2min | Tue==c2min | Wed==c2min | Thurs==c2min | Fri==c2min | Sat==c2min | Sun==c2min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170803074:if(camera2.all %>% summarise(min(Mon))==c2min)
+1543170803076:{
+1543170803078:c2min.day <- 'Monday'
+1543170803232:} else if (camera2.all %>% summarise(min(Tue))==c2min){
+1543170803234:c2min.day <- 'Tuesday'
+1543170803236:} else if (camera2.all %>% summarise(min(Wed))==c2min){
+1543170803238:c2min.day <- 'Wednesday'
+1543170803240:} else if (camera2.all %>% summarise(min(Thurs))==c2min){
+1543170803242:c2min.day <- 'Thursday'
+1543170803243:} else if (camera2.all %>% summarise(min(Fri))==c2min){
+1543170803245:c2min.day <- 'Friday'
+1543170803247:} else if (camera2.all %>% summarise(min(Sat))==c2min){
+1543170803249:c2min.day <- 'Saturday'
+1543170803250:} else if (camera2.all %>% summarise(min(Sun))==c2min){
+1543170803252:c2min.day <- 'Sunday'
+1543170803254:}
+1543170803259:c2min.result
+1543170819211:c2min <- camera2.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170819387:c2min.result <- camera2.all %>% filter(Week!='Week_01') %>% filter(Mon==c2min | Tue==c2min | Wed==c2min | Thurs==c2min | Fri==c2min | Sat==c2min | Sun==c2min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170819398:if(camera2.all %>% summarise(min(Mon))==c2min)
+1543170819401:{
+1543170819402:c2min.day <- 'Monday'
+1543170819404:} else if (camera2.all %>% summarise(min(Tue))==c2min){
+1543170819406:c2min.day <- 'Tuesday'
+1543170819408:} else if (camera2.all %>% summarise(min(Wed))==c2min){
+1543170819409:c2min.day <- 'Wednesday'
+1543170819411:} else if (camera2.all %>% summarise(min(Thurs))==c2min){
+1543170819412:c2min.day <- 'Thursday'
+1543170819414:} else if (camera2.all %>% summarise(min(Fri))==c2min){
+1543170819416:c2min.day <- 'Friday'
+1543170819417:} else if (camera2.all %>% summarise(min(Sat))==c2min){
+1543170819419:c2min.day <- 'Saturday'
+1543170819420:} else if (camera2.all %>% summarise(min(Sun))==c2min){
+1543170819422:c2min.day <- 'Sunday'
+1543170819423:}
+1543170819428:c2min.result
+1543170878520:c1min <- camera1.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543170878520:c1min.result <- camera1.all %>% filter(Week!='Week_01') %>% filter(Mon==c1min | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543170878763:if(camera1.all %>% summarise(min(Mon))==c1min)
+1543170878765:{
+1543170878767:c1min.day <- 'Monday'
+1543170878769:} else if (camera1.all %>% summarise(min(Tue))==c1min){
+1543170878771:c1min.day <- 'Tuesday'
+1543170878773:} else if (camera1.all %>% summarise(min(Wed))==c1min){
+1543170878775:c1min.day <- 'Wednesday'
+1543170878777:} else if (camera1.all %>% summarise(min(Thurs))==c1min){
+1543170878779:c1min.day <- 'Thursday'
+1543170878780:} else if (camera1.all %>% summarise(min(Fri))==c1min){
+1543170878782:c1min.day <- 'Friday'
+1543170878784:} else if (camera1.all %>% summarise(min(Sat))==c1min){
+1543170878785:c1min.day <- 'Saturday'
+1543170878787:} else if (camera1.all %>% summarise(min(Sun))==c1min){
+1543170878788:c1min.day <- 'Sunday'
+1543170878790:}
+1543170878795:c1min.result
+1543171050721:c2min <- camera2.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543171050725:c2min.result <- camera2.all %>% filter(Week!='Week_01') %>% filter(Mon==c2min | Tue==c2min | Wed==c2min | Thurs==c2min | Fri==c2min | Sat==c2min | Sun==c2min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543171050739:if(camera2.all %>% summarise(min(Mon))==c2min)
+1543171050741:{
+1543171050743:c2min.day <- 'Monday'
+1543171051087:} else if (camera2.all %>% summarise(min(Tue))==c2min){
+1543171051089:c2min.day <- 'Tuesday'
+1543171051091:} else if (camera2.all %>% summarise(min(Wed))==c2min){
+1543171051244:c2min.day <- 'Wednesday'
+1543171051246:} else if (camera2.all %>% summarise(min(Thurs))==c2min){
+1543171051248:c2min.day <- 'Thursday'
+1543171051250:} else if (camera2.all %>% summarise(min(Fri))==c2min){
+1543171051251:c2min.day <- 'Friday'
+1543171051253:} else if (camera2.all %>% summarise(min(Sat))==c2min){
+1543171051254:c2min.day <- 'Saturday'
+1543171051256:} else if (camera2.all %>% summarise(min(Sun))==c2min){
+1543171051258:c2min.day <- 'Sunday'
+1543171051259:}
+1543171051264:c2min.result
+1543171202041:camera2.all %>% filter(Week=='Week_13')
+1543171332784:c2min.result
+1543171339366:c2min.result$Week
+1543171346841:camera2.all %>% filter(Week==c2min.result$Week)
+1543171411456:c1min <- camera1.all %>% filter(Week!='Week_01') %>% summarise(min(Mon), min(Tue), min(Wed), min(Thurs), min(Fri), min(Sat), min(Sun)) %>% min()
+1543171411461:c1min.result <- camera1.all %>% filter(Week!='Week_01') %>% filter(Mon==c1min | Tue==c1min | Wed==c1min | Thurs==c1min | Fri==c1min | Sat==c1min | Sun==c1min) %>% select(Week, Time, Mon, Tue, Wed, Thurs, Fri, Sat, Sun)
+1543171411476:if(camera1.all %>% summarise(min(Mon))==c1min)
+1543171411478:{
+1543171411837:c1min.day <- 'Monday'
+1543171411839:} else if (camera1.all %>% summarise(min(Tue))==c1min){
+1543171411841:c1min.day <- 'Tuesday'
+1543171411843:} else if (camera1.all %>% summarise(min(Wed))==c1min){
+1543171411845:c1min.day <- 'Wednesday'
+1543171411847:} else if (camera1.all %>% summarise(min(Thurs))==c1min){
+1543171411849:c1min.day <- 'Thursday'
+1543171411851:} else if (camera1.all %>% summarise(min(Fri))==c1min){
+1543171411852:c1min.day <- 'Friday'
+1543171411854:} else if (camera1.all %>% summarise(min(Sat))==c1min){
+1543171411855:c1min.day <- 'Saturday'
+1543171411857:} else if (camera1.all %>% summarise(min(Sun))==c1min){
+1543171411859:c1min.day <- 'Sunday'
+1543171411860:}
+1543171411865:c1min.result
+1543171450635:# Checking if camera working
+1543171450637:camera1.all %>% filter(Week==Week_25)
+1543171457385:# Checking if camera working
+1543171457388:camera1.all %>% filter(Week=='Week_25')
+1543171464395:camera1.all %>% filter(Week=='Week_25')
+1543171507038:c1min.result
+1543171542659:min(c1min.result$Time)
+1543171542668:max(c1min.result$Time)
+1543172205697:ambient.sound.url <- 'https://data.smartdublin.ie/dataset/a52fbbe2-1bff-4897-84af-34945f6fc8de/resource/30cb9275-f9fb-432a-af48-0a5f7ab462a4/download/chancerypark2013.zip'
+1543172205697:download.file(ambient.sound.url, destfile = 'ambient_sound.zip')
+1543172206581:unzip('ambient_sound.zip', exdir = './ambient_sound')
+1543172579538:c1max
+1543172592523:camera1.all
+1543172626907:camera1.all.norm <- mutate(Mon.norm <- Mon/c1max)
+1543172636187:camera1.all.norm <- mutate(Mon.norm=Mon/c1max)
+1543172648852:camera1.all.norm <- camera1.all %>% mutate(Mon.norm=Mon/c1max)
+1543172649026:camera1.all.norm
+1543173060274:camera1.all.norm <- camera1.all %>% mutate(Mon.norm=Mon/c1max) %>% mutate(Tue.norm=Tue/c1max) %>% mutate(Wed.norm=Wed/c1max) %>% mutate(Thurs.norm=Thurs/c1max) %>% mutate(Fri.norm=Fri/c1max) %>% mutate(Sat.norm=Sat/c1max) %>% mutate(Sun.norm=Sun/c1max)
+1543173060397:camera1.all.norm
+1543173181391:camera1.all.norm <- camera1.all %>% mutate(Mon.norm=Mon/c1max) %>% mutate(Tue.norm=Tue/c1max) %>% mutate(Wed.norm=Wed/c1max) %>% mutate(Thurs.norm=Thurs/c1max) %>% mutate(Fri.norm=Fri/c1max) %>% mutate(Sat.norm=Sat/c1max) %>% mutate(Sun.norm=Sun/c1max) %>% select(Week.fact, Time, Mon.norm, Tue.norm, Wed.norm, Thurs.norm, Fri.norm, Sat.norm, Sun.norm)
+1543173181475:camera1.all.norm
+1543173334225:sound.all
+1543173401823:noise.max <- sound.all %>% summarise(max(mon.noise), max(tue.noise), max(wed.noise), max(thurs.noise), max(fri.noise), max(sat.noise), max(sun.noise)) %>% max()
+1543173401835:noise.max
+1543173868315:noise.all.norm <- sound.all %>% mutate(Mon.norm=mon.noise/c1max) %>% mutate(Tue.norm=tue.noise/c1max) %>% mutate(Wed.norm=wed.noise/c1max) %>% mutate(Thurs.norm=thurs.noise/c1max) %>% mutate(Fri.norm=fri.noise/c1max) %>% mutate(Sat.norm=sat.noise/c1max) %>% mutate(Sun.norm=sun.noise/c1max) %>% select(Week.fact, Time, Mon.norm, Tue.norm, Wed.norm, Thurs.norm, Fri.norm, Sat.norm, Sun.norm)
+1543173868377:noise.all.norm
+1543174138379:# Looking at the ratio of footfall to ambient noise
+1543174138388:# Normalising the footfall levels by dividing my max over the year
+1543174138397:camera1.all.norm <- camera1.all %>% mutate(Mon.norm=Mon/c1max) %>% mutate(Tue.norm=Tue/c1max) %>% mutate(Wed.norm=Wed/c1max) %>% mutate(Thurs.norm=Thurs/c1max) %>% mutate(Fri.norm=Fri/c1max) %>% mutate(Sat.norm=Sat/c1max) %>% mutate(Sun.norm=Sun/c1max) %>% select(Week.fact, Time, Mon.norm, Tue.norm, Wed.norm, Thurs.norm, Fri.norm, Sat.norm, Sun.norm)
+1543174138480:noise.max <- sound.all %>% summarise(max(mon.noise), max(tue.noise), max(wed.noise), max(thurs.noise), max(fri.noise), max(sat.noise), max(sun.noise)) %>% max()
+1543174138501:noise.all.norm <- sound.all %>% mutate(Mon.norm=mon.noise/c1max) %>% mutate(Tue.norm=tue.noise/c1max) %>% mutate(Wed.norm=wed.noise/c1max) %>% mutate(Thurs.norm=thurs.noise/c1max) %>% mutate(Fri.norm=fri.noise/c1max) %>% mutate(Sat.norm=sat.noise/c1max) %>% mutate(Sun.norm=sun.noise/c1max) %>% select(Week.fact, Time, Mon.norm, Tue.norm, Wed.norm, Thurs.norm, Fri.norm, Sat.norm, Sun.norm)
+1543174138529:camera1.all.norm
+1543174138596:noise.all.norm
+1543174259692:#norm.ratio
+1543174259696:camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543174414858:norm.ratio$Mon <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543174486534:#norm.ratio$Mon <-
+1543174486537:camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543174636281:norm.ratio <- data.frame(matrix(ncol = 9, nrow = 0))
+1543174636309:colnames(norm.ratio) <- c('Week', 'Time', 'Mon.norm', 'Tue.norm', 'Wed.norm', 'Thurs.norm', 'Fri.norm', 'Sat.norm', 'Sun.norm')
+1543174643844:norm.ratio$Mon <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543174681903:norm.ratio <- data.frame(matrix(ncol = 9, nrow = length(camera1.all.norm)))
+1543174681978:colnames(norm.ratio) <- c('Week', 'Time', 'Mon.norm', 'Tue.norm', 'Wed.norm', 'Thurs.norm', 'Fri.norm', 'Sat.norm', 'Sun.norm')
+1543174682003:norm.ratio$Mon <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175157399:norm.ratio <- data.frame(matrix(ncol = 9, nrow = 1))
+1543175157426:norm.ratio
+1543175168553:norm.ratio <- data.frame(matrix(ncol = 9, nrow = 0))
+1543175168572:norm.ratio
+1543175224984:colnames(norm.ratio) <- c('Week', 'Time', 'Mon.norm', 'Tue.norm', 'Wed.norm', 'Thurs.norm', 'Fri.norm', 'Sat.norm', 'Sun.norm')
+1543175225008:norm.ratio
+1543175243210:norm.ratio$Mon <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175251663:norm.ratio$Mon.norm <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175259308:norm.ratio$Mon.norm# <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175263218:norm.ratio$Mon.norm <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175273944:#norm.ratio$Mon.norm <-
+1543175273951:camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175303515:norm.ratio$Mon.norm
+1543175318184:norm.ratio$Mon.norm
+1543175407050:camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175427349:norm.ratio[Mon.norm] <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175440517:norm.ratio[Mon.norm] #<- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175455890:norm.ratio <- data.frame(matrix(ncol = 9, nrow = 1))
+1543175455913:norm.ratio
+1543175455950:colnames(norm.ratio) <- c('Week', 'Time', 'Mon.norm', 'Tue.norm', 'Wed.norm', 'Thurs.norm', 'Fri.norm', 'Sat.norm', 'Sun.norm')
+1543175455978:norm.ratio
+1543175462271:norm.ratio[Mon.norm] #<- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175473548:norm.ratio$Mon.norm #<- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175478427:norm.ratio$Mon.norm <- camera1.all.norm$Mon.norm/noise.all.norm$Mon.norm
+1543175641851:noise.all.norm
+1543175684510:norm.ratio <- noise.all.norm
+1543175692453:norm.ratio <- noise.all.norm
+1543175692462:norm.ratio
+1543175776764:norm.ratio$Mon.norm <- norm.ratio$Mon.norm/camera1.all.norm
+1543175789763:norm.ratio$Mon.norm <- norm.ratio$Mon.norm/camera1.all.norm$Mon.norm
+1543175863223:camera1.all.norm[is.nan(camera1.all.norm)] <- 0
+1543175871689:camera1.all.norm
+1543175910117:is.nan(camera1.all.norm)
+1543175931947:is.na(camera1.all.norm)
+1543175939998:is.nan(camera1.all.norm)
+1543175952363:is.infinite(camera1.all.norm)
+1543175961613:is.na(camera1.all.norm)
+1543176077472:norm.ratio$Mon.norm <- norm.ratio$Mon.norm/camera1.all.norm$Mon.norm
+1543176134393:camera1.all.norm
+1543176134555:noise.all.norm
+1543176157455:norm.join <- left_join(noise.all.norm, camera1.all.norm, by=c('Week.fact', 'Time'))
+1543176157470:norm.join
+1543176166129:?left_join
+1543176206700:norm.join <- left_join(noise.all.norm, camera1.all.norm, by=c('Week.fact', 'Time'), suffix=c('.noise','.footfall'))
+1543176206718:norm.join
+1543176237768:norm.join %>% mutate(Mon.norm=Mon.norm.noise/Mon.norm.footfall)
+1543176329610:norm.join %>% mutate(Mon.norm=Mon.norm.noise/Mon.norm.footfall) %>% mutate(Tue.norm=Tue.norm.noise/Tue.norm.footfall) %>% mutate(Wed.norm=Wed.norm.noise/Wed.norm.footfall) %>% mutate(Thurs.norm=Thurs.norm.noise/Thurs.norm.footfall) %>% mutate(Fri.norm=Fri.norm.noise/Fri.norm.footfall) %>% mutate(Sat.norm=Sat.norm.noise/Sat.norm.footfall) %>% mutate(Sun.norm=Sun.norm.noise/Sun.norm.footfall)
+1543176378458:norm.join %>% mutate(Mon.norm=Mon.norm.noise/Mon.norm.footfall) %>% mutate(Tue.norm=Tue.norm.noise/Tue.norm.footfall) %>% mutate(Wed.norm=Wed.norm.noise/Wed.norm.footfall) %>% mutate(Thurs.norm=Thurs.norm.noise/Thurs.norm.footfall) %>% mutate(Fri.norm=Fri.norm.noise/Fri.norm.footfall) %>% mutate(Sat.norm=Sat.norm.noise/Sat.norm.footfall) %>% mutate(Sun.norm=Sun.norm.noise/Sun.norm.footfall) %>% select(Week.fact, Time, Mon.norm, Tue.norm, Wed.norm, Thurs.norm, Fri.norm, Sat.norm, Sun.norm)
+1543176412480:norm.ratio <- left_join(noise.all.norm, camera1.all.norm, by=c('Week.fact', 'Time'), suffix=c('.noise','.footfall')) %>% mutate(Mon.norm=Mon.norm.noise/Mon.norm.footfall) %>% mutate(Tue.norm=Tue.norm.noise/Tue.norm.footfall) %>% mutate(Wed.norm=Wed.norm.noise/Wed.norm.footfall) %>% mutate(Thurs.norm=Thurs.norm.noise/Thurs.norm.footfall) %>% mutate(Fri.norm=Fri.norm.noise/Fri.norm.footfall) %>% mutate(Sat.norm=Sat.norm.noise/Sat.norm.footfall) %>% mutate(Sun.norm=Sun.norm.noise/Sun.norm.footfall) %>% select(Week.fact, Time, Mon.norm, Tue.norm, Wed.norm, Thurs.norm, Fri.norm, Sat.norm, Sun.norm)
+1543176412653:norm.ratio
+1543176511311:norm.ratio <- left_join(noise.all.norm, camera1.all.norm, by=c('Week.fact', 'Time'), suffix=c('.noise','.footfall')) %>% mutate(Mon.norm=Mon.norm.noise/Mon.norm.footfall) %>% mutate(Tue.norm=Tue.norm.noise/Tue.norm.footfall) %>% mutate(Wed.norm=Wed.norm.noise/Wed.norm.footfall) %>% mutate(Thurs.norm=Thurs.norm.noise/Thurs.norm.footfall) %>% mutate(Fri.norm=Fri.norm.noise/Fri.norm.footfall) %>% mutate(Sat.norm=Sat.norm.noise/Sat.norm.footfall) %>% mutate(Sun.norm=Sun.norm.noise/Sun.norm.footfall) %>% mutate(Week.time=paste(Week.fact, Time)) %>% select(Week.fact, Time, Week.time, Mon.norm, Tue.norm, Wed.norm, Thurs.norm, Fri.norm, Sat.norm, Sun.norm)
+1543176511328:norm.ratio
+1543176573020:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm, group=1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543176599132:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm, group=1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543176660922:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm, group=1)) + facet_grid(rows=vars(Week.fact), scale = 'fixed') + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543176677510:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) + facet_grid(rows=vars(Week.fact), scale = 'fixed') + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543176771269:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) + facet_grid(rows=vars(Week.fact), scale = 'fixed') + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure 5: Number of journeys on each route by service type')
+1543176789177:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) + facet_grid(rows=vars(Week.fact), scale = 'fixed') + geom_point() + geom_line() #+ theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure 5: Number of journeys on each route by service type')
+1543176812738:ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) + facet_grid(rows=vars(Week.fact), scale = 'fixed') + geom_point() + geom_line() #+ theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure 5: Number of journeys on each route by service type')
+1543176884886:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) + facet_grid(rows=vars(Week.fact), scale = 'fixed') + geom_point() + geom_line()
+1543176897038:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) + facet_grid(rows=vars(Week.fact)) + geom_point() + geom_line()
+1543176974682:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) + facet_grid(rows=vars(Week.fact)) + geom_point(shape=1)
+1543176984519:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) +  geom_point(shape=1)
+1543177011518:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) +  geom_point(shape=1) + facet_wrap( ~
+1543177011521:Week.fact, ncol=2)
+1543177064511:ggplot(data=norm.ratio, aes(x=Week.time, y=Tue.norm)) +  geom_point(shape=1) + facet_wrap(. ~
+1543177064514:Week.fact, ncol=2)
+1543177088754:ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1) + facet_wrap(. ~
+1543177088875:Week.fact, ncol=2)
+1543177112696:ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1) #+ facet_wrap(. ~ Week.fact, ncol=2)
+1543177161225:ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1) #+ facet_wrap(. ~ Week.fact, ncol=2)
+1543177226756:ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1)
+1543177227105:ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1)
+1543177275476:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm))
+1543177275504:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm))# +  geom_point(shape=1)
+1543177275520:p1 + p2 +  geom_point(shape=1)
+1543177324252:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1)
+1543177324427:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1)
+1543177324450:grid.arrange(p1, p2, nrow = 1)
+1543177341615:library(gridExtra)
+1543177347195:library(gridExtra)
+1543177347198:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1)
+1543177347215:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1)
+1543177347246:grid.arrange(p1, p2, nrow = 1)
+1543177385330:grid.arrange(p1, p2, nrow = 2)
+1543177423447:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1)
+1543177423473:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1)
+1543177423489:p3 <- ggplot(data=norm.ratio, aes(x=Time, y=Wed.norm)) +  geom_point(shape=1)
+1543177423536:p4 <- ggplot(data=norm.ratio, aes(x=Time, y=Thurs.norm)) +  geom_point(shape=1)
+1543177423668:p5 <- ggplot(data=norm.ratio, aes(x=Time, y=Fri.norm)) +  geom_point(shape=1)
+1543177423691:p6 <- ggplot(data=norm.ratio, aes(x=Time, y=Sat.norm)) +  geom_point(shape=1)
+1543177423713:p7 <- ggplot(data=norm.ratio, aes(x=Time, y=Sun.norm)) +  geom_point(shape=1)
+1543177423739:grid.arrange(p1, p2, nrow = 2)
+1543177440267:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1)
+1543177440286:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1)
+1543177440467:p3 <- ggplot(data=norm.ratio, aes(x=Time, y=Wed.norm)) +  geom_point(shape=1)
+1543177440488:p4 <- ggplot(data=norm.ratio, aes(x=Time, y=Thurs.norm)) +  geom_point(shape=1)
+1543177440510:p5 <- ggplot(data=norm.ratio, aes(x=Time, y=Fri.norm)) +  geom_point(shape=1)
+1543177440531:p6 <- ggplot(data=norm.ratio, aes(x=Time, y=Sat.norm)) +  geom_point(shape=1)
+1543177440558:p7 <- ggplot(data=norm.ratio, aes(x=Time, y=Sun.norm)) +  geom_point(shape=1)
+1543177440734:grid.arrange(p1, p2,, p3, p4, p5, p6, p7, nrow = 7)
+1543177448566:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1)
+1543177448725:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1)
+1543177448748:p3 <- ggplot(data=norm.ratio, aes(x=Time, y=Wed.norm)) +  geom_point(shape=1)
+1543177448769:p4 <- ggplot(data=norm.ratio, aes(x=Time, y=Thurs.norm)) +  geom_point(shape=1)
+1543177448790:p5 <- ggplot(data=norm.ratio, aes(x=Time, y=Fri.norm)) +  geom_point(shape=1)
+1543177448813:p6 <- ggplot(data=norm.ratio, aes(x=Time, y=Sat.norm)) +  geom_point(shape=1)
+1543177448835:p7 <- ggplot(data=norm.ratio, aes(x=Time, y=Sun.norm)) +  geom_point(shape=1)
+1543177448874:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 7)
+1543177691455:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1) + labs(y = 'Monday', title='Figure X: Ambient Noise to Footfall Ratio')
+1543177691479:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1) + labs(y = 'Tuesday')
+1543177691503:p3 <- ggplot(data=norm.ratio, aes(x=Time, y=Wed.norm)) +  geom_point(shape=1) + labs(y = 'Wednesday')
+1543177691526:p4 <- ggplot(data=norm.ratio, aes(x=Time, y=Thurs.norm)) +  geom_point(shape=1)
+1543177691573:p5 <- ggplot(data=norm.ratio, aes(x=Time, y=Fri.norm)) +  geom_point(shape=1)
+1543177691596:p6 <- ggplot(data=norm.ratio, aes(x=Time, y=Sat.norm)) +  geom_point(shape=1)
+1543177691620:p7 <- ggplot(data=norm.ratio, aes(x=Time, y=Sun.norm)) +  geom_point(shape=1)
+1543177691645:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 7)
+1543177706175:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Monday', title='Figure X: Ambient Noise to Footfall Ratio')
+1543177706356:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1) + labs(y = 'Tuesday')
+1543177706379:p3 <- ggplot(data=norm.ratio, aes(x=Time, y=Wed.norm)) +  geom_point(shape=1) + labs(y = 'Wednesday')
+1543177706403:p4 <- ggplot(data=norm.ratio, aes(x=Time, y=Thurs.norm)) +  geom_point(shape=1)
+1543177706424:p5 <- ggplot(data=norm.ratio, aes(x=Time, y=Fri.norm)) +  geom_point(shape=1)
+1543177706450:p6 <- ggplot(data=norm.ratio, aes(x=Time, y=Sat.norm)) +  geom_point(shape=1)
+1543177706472:p7 <- ggplot(data=norm.ratio, aes(x=Time, y=Sun.norm)) +  geom_point(shape=1)
+1543177706497:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 7)
+1543177746378:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Monday', title='Figure X: Ambient Noise to Footfall Ratio')
+1543177746409:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Tuesday')
+1543177746416:p3 <- ggplot(data=norm.ratio, aes(x=Time, y=Wed.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Wednesday')
+1543177746447:p4 <- ggplot(data=norm.ratio, aes(x=Time, y=Thurs.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Thursday')
+1543177746463:p5 <- ggplot(data=norm.ratio, aes(x=Time, y=Fri.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Friday')
+1543177746673:p6 <- ggplot(data=norm.ratio, aes(x=Time, y=Sat.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Saturday')
+1543177746698:p7 <- ggplot(data=norm.ratio, aes(x=Time, y=Sun.norm)) +  geom_point(shape=1) + labs(x = 'Time', y = 'Sunday')
+1543177746721:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 7)
+1543178073450:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall))  + geom_point() + geom_line() + labs(x = '', y = 'Monday', title='Figure X: Ambient Noise to Footfall Ratio')
+1543178073466:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level)) +  geom_point(shape=1) + labs(x = 'Time', y = 'Sunday')  +
+1543178073466:grid.arrange(p1, p2, nrow = 2)
+1543178094080:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall))  + geom_point() + geom_line() + labs(x = '', y = 'Monday', title='Figure X: Ambient Noise to Footfall Ratio')
+1543178094252:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level)) +  geom_point(shape=1) + labs(x = 'Time', y = 'Sunday')
+1543178094269:grid.arrange(p1, p2, nrow = 2)
+1543178126814:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1))  + geom_point() + geom_line() + labs(x = '', y = 'Monday', title='Figure X: Ambient Noise to Footfall Ratio')
+1543178127008:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + labs(x = 'Time', y = 'Sunday')
+1543178127033:grid.arrange(p1, p2, nrow = 2)
+1543178209508:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1))  + geom_point() + geom_line() + labs(x = '', y = paste('Footfall Levels at', gsub("Entrance Name: ","", camera1.name)), title='Figure X: Ambient Noise to Footfall Ratio')
+1543178209863:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + labs(x = 'Time', y = 'Sunday')
+1543178209882:grid.arrange(p1, p2, nrow = 2)
+1543178396888:sound.week <- sound.all %>% group_by(Week.fact) %>% summarise(Sound_Level=sum(All))
+1543178396904:sound.week
+1543178396904:camera1.sum.week
+1543178396923:ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543178397221:ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543178397591:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1))  + geom_point() + geom_line() + labs(x = '', y = paste('Footfall Levels at', gsub("Entrance Name: ","", camera1.name)), title='Figure X: Ambient Noise to Footfall Ratio')
+1543178397615:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + labs(x = 'Weeks of Year', y = 'Ambient Noise Levels at Chancery Park')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543178397643:grid.arrange(p1, p2, nrow = 2)
+1543178413642:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1))  + geom_point() + geom_line() + labs(x = '', y = paste('Footfall Levels at', gsub("Entrance Name: ","", camera1.name)), title='Figure X: Ambient Noise to Footfall Ratio')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543178413973:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + labs(x = 'Weeks of Year', y = 'Ambient Noise Levels at Chancery Park')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543178413999:grid.arrange(p1, p2, nrow = 2)
+1543178447832:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1))  + geom_point() + geom_line() + labs(x = '', y = paste('Footfall Levels at', gsub("Entrance Name: ","", camera1.name)), title='Figure X: Ambient Noise and Footfall Levels over Year 2013')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543178448018:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + labs(x = 'Weeks of Year', y = 'Ambient Noise Levels at Chancery Park')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543178448045:grid.arrange(p1, p2, nrow = 2)
+1543178518316:# I need to loop through all dates in the year to pull out each text file. Here I create a df of all required components
+1543178518319:months <- format(ISOdate(2013,1:12,1),"%B")
+1543178518324:dates.df <- data.frame(matrix(ncol = 4, nrow = 0))
+1543178518330:colnames(dates.df) <- c('year', 'month.char', 'month.num', 'day')
+1543178518386:for (i in 1:12)
+1543178518389:{
+1543178518391:date.i <- data.frame(matrix(ncol = 4, nrow = 1))
+1543178518394:colnames(date.i) <- c('year', 'month.char', 'month.num', 'day')
+1543178518398:date.i$year <- '2013'
+1543178518400:date.i$month.char <- months[i]
+1543178518403:if(nchar(as.character(i))==1)
+1543178518405:{
+1543178518407:date.i$month.num <- paste('0', i, sep='')
+1543178518409:} else {
+1543178518411:date.i$month.num <- i
+1543178518413:}
+1543178518418:if(months[i]=='December')
+1543178518420:{
+1543178518422:date.i$day = 28 #the last 3 days of the year are excluded from the footfall dataset
+1543178518425:} else {
+1543178518427:date.i$day <- as.Date(paste('2013','-', i ,'-01', sep=''), '%Y-%m-%d') %>% days_in_month()
+1543178518429:}
+1543178518431:dates.df <- rbind(dates.df, date.i)
+1543178518435:date.i <- NULL
+1543178518437:}
+1543178522888:# running through each file and loading
+1543178522888:sound.all <- data.frame(matrix(ncol = 4, nrow = 0))
+1543178522888:colnames(sound.all) <- c('week', 'day.week', 'Time', 'mean.noise.level')
+1543178522904:for (i.month in 1:nrow(dates.df))
+1543178522904:{
+1543178522904:for (i.day in 1:dates.df$day[i.month])
+1543178522904:{
+1543178522904:if(nchar(as.character(i.day))==1)
+1543178522904:{
+1543178522919:sound.file <- paste('ambient_sound/',dates.df$year[i.month], '/', dates.df$month.char[i.month], '/DCC-NOISE-001011-2013-', dates.df$month.num[i.month], '-0', i.day, 'T00-00-00.txt', sep='')
+1543178522919:} else {
+1543178522929:sound.file <- paste('ambient_sound/2013/', dates.df$month.char[i.month], '/DCC-NOISE-001011-2013-', dates.df$month.num[i.month], '-', i.day, 'T00-00-00.txt', sep='')
+1543178522932:}
+1543178522934:if (!file.exists(sound.file)) next
+1543178522937:sound.read <- read.table(sound.file)
+1543178522939:sound.df <- sound.read %>% select(date.sound=V1, time=V2, noise.level=V3)
+1543178522942:sound.all <- rbind.data.frame(sound.all, sound.df)
+1543178522947:sound.df<- NULL
+1543178522949:}
+1543178522952:}
+1543178530617:# Fixing punctuation and tidying up
+1543178530617:sound.tidy <- sound.all
+1543178530617:sound.tidy$time <-  gsub(",","", sound.tidy$time)
+1543178530659:sound.tidy$noise.level <-  as.numeric(gsub(",","", sound.tidy$noise.level))
+1543178530705:sound.tidy$date.sound <-  as.Date(sound.tidy$date.sound, format='%d/%m/%Y')
+1543178530742:sound.tidy$Time <- paste(format(strptime(sound.tidy$time,format='%H:%M:%S'), "%H"), ':00', sep='')
+1543178531430:sound.tidy.summary <- sound.tidy %>% group_by(date.sound, Time) %>% summarise(mean.noise.level=mean(noise.level))
+1543178531518:sound.tidy.summary$Week <- paste('Week', strftime(sound.tidy.summary$date.sound, "%V"), sep='_')
+1543178531638:sound.tidy.summary$day.week <- format(as.Date(sound.tidy.summary$date.sound), "%A")
+1543178531709:sound.tidy.all <- sound.tidy.summary[2:5]
+1543178534865:# The data is arranged longways. Changing to day per column in order to compare to footfall data
+1543178534865:sound.split <- split(sound.tidy.all, sound.tidy.all$day.week)
+1543178534913:sound.mon <- sound.split$Monday %>% select(., Week, Time, mon.noise=mean.noise.level)
+1543178534922:sound.tue <- sound.split$Tuesday %>% select(Week, Time, tue.noise=mean.noise.level)
+1543178534931:sound.wed <- sound.split$Wednesday %>% select(Week, Time, wed.noise=mean.noise.level)
+1543178534940:sound.thurs <- sound.split$Thursday %>% select(Week, Time, thurs.noise=mean.noise.level)
+1543178534948:sound.fri <- sound.split$Friday %>% select(Week, Time, fri.noise=mean.noise.level)
+1543178534956:sound.sat <- sound.split$Saturday %>% select(Week, Time, sat.noise=mean.noise.level)
+1543178534968:sound.sun <- sound.split$Sunday %>% select(Week, Time, sun.noise=mean.noise.level)
+1543178534976:sound.new <- sound.mon %>% full_join(sound.tue, by=c('Week', 'Time')) %>% full_join(sound.wed, by=c('Week', 'Time')) %>% full_join(sound.thurs, by=c('Week', 'Time')) %>% full_join(sound.fri, by=c('Week', 'Time')) %>% full_join(sound.sat, by=c('Week', 'Time')) %>% full_join(sound.sun, by=c('Week', 'Time')) %>% arrange(Week, Time)  %>% mutate(Week.fact=as.factor(Week))
+1543178534994:sound.new[is.na(sound.new)] <- 0
+1543178535004:sound.all <- sound.new %>% mutate(All=mon.noise+tue.noise+wed.noise+thurs.noise+fri.noise+sat.noise+sun.noise)
+1543178544097:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1))  + geom_point() + geom_line() + labs(x = '', y = paste('Footfall Levels at', gsub("Entrance Name: ","", camera1.name)), title='Figure 9: Ambient Noise and Footfall Levels over Year 2013')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543178544126:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + labs(x = 'Weeks of Year', y = 'Ambient Noise Levels at Chancery Park')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543178544153:grid.arrange(p1, p2, nrow = 2)
+1543179227492:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179227492:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179227508:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179227508:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179227524:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179227539:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179227539:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179227555:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179227555:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179227575:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179227583:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, sat) %>% mutate(Label='Footfall')
+1543179251393:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179251393:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179251424:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179251443:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179251453:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179251467:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179251476:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179251487:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179251496:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179251506:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179251514:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179251523:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179251531:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179251539:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179251547:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179251577:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179251607:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179251637:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179251666:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179251694:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179251739:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179252727:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179310435:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179310435:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179310450:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179310450:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179310466:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179310481:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179310481:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179310497:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179310497:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179310513:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179310513:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179310528:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179310528:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179310544:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179310559:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none")
+1543179310611:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179310800:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179310834:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179310864:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179310893:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179311669:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179311850:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179388825:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179388826:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179388842:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179388842:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179388858:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179388858:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179388885:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179388901:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179388901:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179388916:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179388932:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179388932:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179388948:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179388963:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179388963:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none")
+1543179388995:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '',)+ theme(legend.position="none")
+1543179410371:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179410387:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179410387:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179410402:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179410402:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179410418:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179410427:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179410436:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179410444:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179410452:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179410460:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179410468:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179410476:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179410484:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179415783:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none")
+1543179426833:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179426833:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179426848:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179426920:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179426930:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179426943:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179426951:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179426960:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179426968:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179426976:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179426985:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179426993:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179427001:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179427011:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179427018:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none")
+1543179427199:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '')+ theme(legend.position="none")
+1543179427231:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179427273:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179427309:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179427344:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179427374:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Routes', y = 'Number of Trips', title='Figure X: Number of journeys on each route by service type')
+1543179427402:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179475789:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179475790:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179475806:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179475806:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179475822:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179475837:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179475853:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179475869:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179475869:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179475884:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179475884:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179475900:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179475915:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179475915:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179475931:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none")
+1543179475962:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '')+ theme(legend.position="none")
+1543179476064:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '')+ theme(legend.position="none")
+1543179476098:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1))+ labs(x = '', y = '')+ theme(legend.position="none")
+1543179476128:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '')+ theme(legend.position="none")
+1543179476159:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '')+ theme(legend.position="none")
+1543179476208:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = '', y = '')+ theme(legend.position="none")
+1543179476246:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179605897:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179605898:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179605914:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179605914:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179605929:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179605945:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179605945:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179605961:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179605976:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179605976:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179605992:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179606008:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179606008:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179606023:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179606023:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179606023:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1))
+1543179606054:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '')+ theme(legend.position="none")
+1543179606100:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Wednesday', y = '')+ theme(legend.position="none")
+1543179606131:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1))+ labs(x = 'Thursday', y = '')+ theme(legend.position="none")
+1543179606179:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Friday', y = '')+ theme(legend.position="none")
+1543179606214:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Saturday', y = '')+ theme(legend.position="none")
+1543179607521:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Sunday', y = '')+ theme(legend.position="none")
+1543179607558:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179670004:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179670013:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179670016:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179670016:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179670031:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179670051:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179670060:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179670069:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179670097:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179670107:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179670117:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179670127:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179670137:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179670146:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179670155:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179670158:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none", axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179670191:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none")
+1543179670222:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none")
+1543179670248:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none")
+1543179670274:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none")
+1543179670298:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none")
+1543179670323:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none")
+1543179670611:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179695673:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179695673:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179695688:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179695688:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179695703:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179695758:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179695766:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179695774:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179695782:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179695791:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179695798:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179695807:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179695814:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179695822:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179695830:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179695833:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none", axis.title.x=element_blank(),axis.text.x=element_blank())
+1543179695858:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none")
+1543179695888:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none")
+1543179695912:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none")
+1543179695947:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none")
+1543179695970:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none")
+1543179695993:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none")
+1543179696016:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179734910:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179734920:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179734928:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179734930:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179734930:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179734946:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179734961:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179734961:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179734977:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179734977:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179734993:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179735008:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179735024:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179735024:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179735039:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179735039:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none", axis.title.x=element_blank(), axis.text.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank())
+1543179735071:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none")
+1543179735086:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none")
+1543179735127:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none")
+1543179735151:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none")
+1543179735175:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none")
+1543179735198:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none")
+1543179735222:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179795150:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179795150:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179795166:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179795166:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179795181:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179795197:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179795197:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179795213:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179795213:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179795228:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179795228:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179795244:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179795244:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179795275:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179795275:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179795275:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none", axis.title.x=element_blank(), axis.text.x=element_blank())
+1543179795306:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none", axis.title.x=element_blank(), axis.text.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank())
+1543179795338:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none")
+1543179795520:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none")
+1543179795546:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none")
+1543179795571:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none")
+1543179795599:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none")
+1543179795623:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179860018:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179860018:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179860049:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179860049:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179860064:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179860080:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179860080:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179860095:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179860095:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179860111:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179860111:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179860127:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179860127:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179860142:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179860142:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179860142:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '', title='Figure X: Number of journeys on each route by service type') + theme(legend.position="none", axis.title.x=element_blank(), axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179860174:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none", axis.title.x=element_blank(), axis.text.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank())
+1543179860205:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none")
+1543179860387:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none")
+1543179860412:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none")
+1543179860442:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none")
+1543179860467:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none")
+1543179860491:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179896851:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179896851:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179896866:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179896866:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179896882:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179896898:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179896898:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179896913:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179896913:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179896929:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179896929:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179896948:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179896949:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179896949:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179896964:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179896964:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '') + theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179896995:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none", axis.title.x=element_blank(), axis.text.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank())
+1543179897027:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none")
+1543179897205:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none")
+1543179897230:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none")
+1543179897272:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none")
+1543179897297:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none")
+1543179897321:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543179984716:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543179984748:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543179984748:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543179984763:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543179984779:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543179984779:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543179984795:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543179984795:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543179984810:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543179984810:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543179984826:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543179984841:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543179984841:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543179984857:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543179984857:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543179984857:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '') + theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179984888:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179985075:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179985101:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179985128:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179985154:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543179985180:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank())
+1543179985367:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543180033561:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543180033563:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543180033579:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543180033589:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543180033597:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543180033609:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543180033618:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543180033623:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543180033623:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543180033638:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543180033638:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543180033654:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543180033654:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543180033670:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543180033685:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543180033685:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '') + theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank())
+1543180033701:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank())
+1543180033900:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank())
+1543180033929:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank())
+1543180033956:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank())
+1543180033984:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank())
+1543180034011:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), axis.text.y=element_blank())
+1543180034035:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543180061408:?theme
+1543180138695:camera1.all.w12.mon  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Mon) %>% mutate(Label='Footfall')
+1543180138695:sound.all.w12.mon  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Mon=mon.noise) %>% mutate(Label='Ambient Noise')
+1543180138711:camera1.all.w12.tue  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Tue) %>% mutate(Label='Footfall')
+1543180138711:sound.all.w12.tue  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Tue=tue.noise) %>% mutate(Label='Ambient Noise')
+1543180138726:camera1.all.w12.wed  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Wed) %>% mutate(Label='Footfall')
+1543180138742:sound.all.w12.wed  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Wed=wed.noise) %>% mutate(Label='Ambient Noise')
+1543180138742:camera1.all.w12.thurs  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Thurs) %>% mutate(Label='Footfall')
+1543180138757:sound.all.w12.thurs  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Thurs=thurs.noise) %>% mutate(Label='Ambient Noise')
+1543180138757:camera1.all.w12.fri  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Fri) %>% mutate(Label='Footfall')
+1543180138773:sound.all.w12.fri  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Fri=fri.noise) %>% mutate(Label='Ambient Noise')
+1543180138773:camera1.all.w12.sat  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sat) %>% mutate(Label='Footfall')
+1543180138789:sound.all.w12.sat  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sat=sat.noise) %>% mutate(Label='Ambient Noise')
+1543180138789:camera1.all.w12.sun  <- camera1.all %>% filter(Week=='Week_12') %>% select(Time, Sun) %>% mutate(Label='Footfall')
+1543180138820:sound.all.w12.sun  <- sound.all %>% filter(Week=='Week_12') %>% select(Time, Sun=sun.noise) %>% mutate(Label='Ambient Noise')
+1543180138820:#theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+1543180138836:p1 <- ggplot(data=rbind(camera1.all.w12.mon, sound.all.w12.mon), aes(x=Time, y=Mon, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Monday', y = '') + theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.ticks.x=element_blank(), axis.ticks.y=element_blank())
+1543180138867:p2 <- ggplot(data=rbind(camera1.all.w12.tue, sound.all.w12.tue), aes(x=Time, y=Tue, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = 'Tuesday', y = '') + theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank(), axis.ticks.x=element_blank(), axis.ticks.y=element_blank())
+1543180138882:p3 <- ggplot(data=rbind(camera1.all.w12.wed, sound.all.w12.wed), aes(x=Time, y=Wed, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Wednesday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank(), axis.ticks.x=element_blank(), axis.ticks.y=element_blank())
+1543180138925:p4 <- ggplot(data=rbind(camera1.all.w12.thurs, sound.all.w12.thurs), aes(x=Time, y=Thurs, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y') + labs(x = 'Thursday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank(), axis.ticks.x=element_blank(), axis.ticks.y=element_blank())
+1543180138954:p5 <- ggplot(data=rbind(camera1.all.w12.fri, sound.all.w12.fri), aes(x=Time, y=Fri, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Friday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank(), axis.ticks.x=element_blank(), axis.ticks.y=element_blank())
+1543180138981:p6 <- ggplot(data=rbind(camera1.all.w12.sat, sound.all.w12.sat), aes(x=Time, y=Sat, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Saturday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), strip.text.y = element_blank(), axis.text.y=element_blank(), axis.ticks.x=element_blank(), axis.ticks.y=element_blank())
+1543180139010:p7 <- ggplot(data=rbind(camera1.all.w12.sun, sound.all.w12.sun), aes(x=Time, y=Sun, group=Label, colour = Label)) + geom_point() + geom_line() + facet_grid(rows=vars(Label), scales='free_y')  + labs(x = 'Sunday', y = '')+ theme(legend.position="none", axis.text.x=element_blank(), strip.text.x = element_blank(), axis.text.y=element_blank(), axis.ticks.x=element_blank(), axis.ticks.y=element_blank())
+1543180139038:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1)
+1543180191611:?grid.arrange
+1543180259217:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1, top = textGrob("Daily QC: Blue",gp=gpar(fontsize=20,font=3)))
+1543180287878:library(grid)
+1543180291647:library(devtools)
+1543180291647:library(readr)
+1543180291647:library(ggplot2)
+1543180291647:library(ggmap)
+1543180291647:devtools::install_github('hadley/ggplot2')
+1543180292596:devtools::install_github('dkahle/ggmap')
+1543180293173:#library(rnoaa)
+1543180293176:library(httr)
+1543180293179:library(plyr)
+1543180293181:library(jsonlite)
+1543180293181:library(dplyr)
+1543180293181:library(readODS)
+1543180293181:library(knitr)
+1543180293181:library(kableExtra)
+1543180293181:library(hms)
+1543180293197:library(lubridate)
+1543180293197:library(tidyr)
+1543180293197:library(stringi)
+1543180293197:library(scales)
+1543180293197:library(grid)
+1543180293215:library(gridExtra)
+1543180307428:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1, top = textGrob("Daily QC: Blue",gp=gpar(fontsize=20,font=3)))
+1543180328357:ggplot(data=rbind(camera1.sum.week, camera2.sum.week), aes(x=Week.fact, y=Footfall, group=Camera, colour = Camera)) + geom_point() + geom_line() + facet_grid(rows=vars(Camera), scales='free_y') + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + labs(x = 'Week of Year 2013', y = 'Footfall', title='Figure 8: Footfall for weeks of year 2013') + scale_y_continuous(labels = comma)
+1543180389643:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 1, top = textGrob("Figure 9: Footfall and Ambient Noise for Each Day of the Week in Week 12 2013",gp=gpar(fontsize=20,font=3)))
+1543180425649:p1 <- ggplot(data=camera1.sum.week, aes(x=Week.fact, y=Footfall, group=1))  + geom_point() + geom_line() + labs(x = '', y = paste('Footfall Levels at', gsub("Entrance Name: ","", camera1.name)), title='Figure 9: Ambient Noise and Footfall Levels over Year 2013')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543180425779:p2 <- ggplot(data=sound.week, aes(x=Week.fact, y=Sound_Level, group=1)) + geom_point() + geom_line() + labs(x = 'Weeks of Year', y = 'Ambient Noise Levels at Chancery Park')  + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+1543180425803:grid.arrange(p1, p2, nrow = 2)
+1543180684778:p1 <- ggplot(data=norm.ratio, aes(x=Time, y=Mon.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Monday', title='Figure X: Ambient Noise to Footfall Ratio')
+1543180684909:p2 <- ggplot(data=norm.ratio, aes(x=Time, y=Tue.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Tuesday')
+1543180684931:p3 <- ggplot(data=norm.ratio, aes(x=Time, y=Wed.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Wednesday')
+1543180685012:p4 <- ggplot(data=norm.ratio, aes(x=Time, y=Thurs.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Thursday')
+1543180685028:p5 <- ggplot(data=norm.ratio, aes(x=Time, y=Fri.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Friday')
+1543180685059:p6 <- ggplot(data=norm.ratio, aes(x=Time, y=Sat.norm)) +  geom_point(shape=1) + labs(x = '', y = 'Saturday')
+1543180685075:p7 <- ggplot(data=norm.ratio, aes(x=Time, y=Sun.norm)) +  geom_point(shape=1) + labs(x = 'Time', y = 'Sunday')
+1543180685124:grid.arrange(p1, p2, p3, p4, p5, p6, p7, nrow = 7)
